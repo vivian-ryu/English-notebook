@@ -38,7 +38,7 @@
   }
   header.top{
     display:flex;
-    align-items:baseline;
+    align-items:center;
     justify-content:space-between;
     margin-bottom:36px;
     border-bottom:1px solid var(--border);
@@ -58,6 +58,20 @@
     text-align:right;
   }
   .streak b{color:var(--ink-soft); font-weight:500;}
+  .back-btn{
+    background:var(--paper);
+    border:1px solid var(--border);
+    border-radius:3px;
+    padding:8px 12px;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:background .15s ease;
+    display:none;
+  }
+  .back-btn:hover{background:rgba(30,44,34,0.05);}
+  .back-btn.show{display:block;}
 
   /* compose card */
   .compose{
@@ -68,6 +82,7 @@
     margin-bottom:44px;
     position:relative;
   }
+  .compose.hidden{display:none;}
   .compose .label{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
@@ -176,7 +191,7 @@
     margin-top:14px;
   }
 
-  /* list */
+  /* list page */
   .list-head{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
@@ -185,7 +200,7 @@
     text-transform:uppercase;
     margin:0 0 14px 2px;
   }
-  .entries{display:flex; flex-direction:column; gap:20px;}
+  .entries{display:flex; flex-direction:column; gap:12px;}
   .empty{
     font-size:14px;
     color:var(--ink-faint);
@@ -194,55 +209,160 @@
     border-radius:4px;
     text-align:center;
   }
+  
   .date-group{
     border-left:3px solid var(--border);
-    padding-left:16px;
+    padding-left:0;
+  }
+  .date-group-header{
+    cursor:pointer;
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    user-select:none;
+    transition:background .15s ease;
+  }
+  .date-group-header:hover{
+    background:rgba(30,44,34,0.03);
+  }
+  .date-group-toggle{
+    font-size:12px;
+    color:var(--ink-soft);
+    transition:transform .2s ease;
+  }
+  .date-group-toggle.collapsed{
+    transform:rotate(-90deg);
   }
   .date-group-title{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
     font-weight:600;
     color:var(--ink-soft);
-    margin-bottom:12px;
     letter-spacing:0.05em;
+    flex:1;
+  }
+  .date-group-count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-faint);
   }
   .date-group-entries{
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:8px;
+    padding:0 16px 8px 16px;
+    max-height:1000px;
+    overflow:hidden;
+    transition:max-height .3s ease, opacity .3s ease, padding .3s ease;
+    opacity:1;
   }
-  .entry{
+  .date-group-entries.collapsed{
+    max-height:0;
+    opacity:0;
+    padding:0 16px;
+  }
+
+  /* entry item */
+  .entry-item{
     background:var(--card);
     border:1px solid var(--border);
     border-radius:4px;
-    padding:18px 20px;
-  }
-  .entry-top{
+    padding:10px 14px;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
+    align-items:center;
     gap:12px;
-    margin-bottom:10px;
   }
-  .entry-time{
+  .entry-item:hover{
+    background:rgba(30,44,34,0.02);
+    border-color:var(--wine);
+  }
+  .entry-item-content{
+    flex:1;
+    min-width:0;
+  }
+  .entry-item-time{
     font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px;
+    font-size:11px;
     color:var(--ink-faint);
-    padding-top:2px;
+    margin-bottom:4px;
   }
-  .entry-del{
+  .entry-item-preview{
+    font-size:13px;
+    color:var(--ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .entry-item-del{
     font-size:12px;
     color:var(--ink-faint);
     flex-shrink:0;
     cursor:pointer;
+    padding:4px;
   }
-  .entry-del:hover{color:var(--wine);}
+  .entry-item-del:hover{color:var(--wine);}
+
+  /* detail page */
+  .detail-view{
+    display:none;
+  }
+  .detail-view.show{
+    display:block;
+  }
+  .detail-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .detail-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    letter-spacing:0.05em;
+  }
+  .detail-entries{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .detail-entry{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:16px;
+  }
+  .detail-entry-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+  }
+  .detail-entry-time{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+  }
+  .detail-entry-del{
+    font-size:12px;
+    color:var(--ink-faint);
+    cursor:pointer;
+    padding:4px;
+  }
+  .detail-entry-del:hover{color:var(--wine);}
   .entry-ko{
-    font-size:15.5px;
-    line-height:1.75;
+    font-size:15px;
+    line-height:1.7;
     color:var(--ink);
     white-space:pre-wrap;
-    margin-bottom:8px;
+    margin-bottom:10px;
   }
   .sentence-pair{
     margin-bottom:14px;
@@ -252,13 +372,14 @@
     border-radius:3px;
     cursor:pointer;
     background:var(--ink);
-    height:38px;
+    height:36px;
     transition:background .15s ease;
+    margin-bottom:8px;
   }
   .mask:hover{background:var(--wine-deep);}
   .en-block{
     display:none;
-    padding:10px 14px;
+    padding:10px 12px;
     background:var(--wine-tint);
     border-radius:3px;
     cursor:pointer;
@@ -267,16 +388,17 @@
   .mask.shown{display:none;}
   .entry-en{
     font-family:'Fraunces', serif;
-    font-size:15.5px;
-    line-height:1.7;
+    font-size:15px;
+    line-height:1.6;
     color:var(--wine-deep);
   }
   .hide-hint{
     font-family:'IBM Plex Mono', monospace;
-    font-size:10.5px;
+    font-size:10px;
     color:var(--ink-faint);
     margin-top:8px;
   }
+
   .share-bar{
     display:none;
     align-items:center;
@@ -351,6 +473,7 @@
 <div class="wrap">
 
   <header class="top">
+    <button class="back-btn" id="backBtn">← 돌아가기</button>
     <div class="brand">한 줄<span class="dot">,</span> 영어로</div>
     <div class="streak" id="streakBox">기록 <b id="entryCount">0</b>개</div>
   </header>
@@ -370,7 +493,8 @@
 
   <div id="appMain" style="display:none;">
 
-  <section class="compose">
+  <!-- Page 1: List View -->
+  <section class="compose" id="compose">
     <div class="label">한글 문장 다음 줄에 영어 문장을 써주세요 (한글, 영어 번갈아가며)</div>
     <textarea id="koInput" placeholder='나는 매일 영어 공부를 한다.
 I study English every single day.
@@ -396,11 +520,20 @@ My goal is to study for 30 minutes every morning.'></textarea>
     <div class="empty" id="emptyState">아직 저장된 노트가 없어요. 위에서 오늘의 문장을 적어보세요.</div>
   </div>
 
+  <!-- Page 2: Detail View -->
+  <div class="detail-view" id="detailView">
+    <div class="detail-header">
+      <div class="detail-title" id="detailTitle"></div>
+    </div>
+    <div class="detail-entries" id="detailEntries"></div>
+  </div>
+
   </div>
 
 </div>
 
 <script>
+const backBtn = document.getElementById('backBtn');
 const koInput = document.getElementById('koInput');
 const translateBtn = document.getElementById('translateBtn');
 const errMsg = document.getElementById('errMsg');
@@ -418,14 +551,19 @@ const appMain = document.getElementById('appMain');
 const shareBar = document.getElementById('shareBar');
 const shareUrl = document.getElementById('shareUrl');
 const copyBtn = document.getElementById('copyBtn');
+const compose = document.getElementById('compose');
+const detailView = document.getElementById('detailView');
+const detailTitle = document.getElementById('detailTitle');
+const detailEntries = document.getElementById('detailEntries');
 
 let pendingSentences = [];
 let entries = [];
 let roomId = null;
+let currentView = 'list'; // 'list' or 'detail'
+let selectedDate = null;
 
 function fmtDate(iso){
   const d = new Date(iso);
-  const days = ['일','월','화','수','목','금','토'];
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
@@ -434,10 +572,8 @@ function fmtTime(iso){
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
-// ===== Supabase 설정: 아래 두 값을 본인의 프로젝트 값으로 바꿔주세요 =====
 const SUPABASE_URL = 'https://dzpiornjgtevorjiipsx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_5M1HdJd_jv2Re1vI8nkaKw_aH1CGW0d';
-// ======================================================================
 
 const SB_HEADERS = {
   'apikey': SUPABASE_ANON_KEY,
@@ -445,7 +581,6 @@ const SB_HEADERS = {
   'Content-Type': 'application/json'
 };
 
-// Simple grammar/spell check using LanguageTool API
 async function checkEnglish(text) {
   try {
     const response = await fetch('https://api.languagetool.org/v2/check', {
@@ -494,7 +629,7 @@ function createRoom(){
   localStorage.setItem('lastRoomId', id);
   entries = [];
   showApp();
-  render();
+  renderListView();
 }
 
 async function loadEntries(){
@@ -508,7 +643,7 @@ async function loadEntries(){
     console.error(e);
     entries = [];
   }
-  render();
+  renderListView();
 }
 
 async function insertEntry(entry){
@@ -545,9 +680,109 @@ function groupByDate(entries) {
   return groups;
 }
 
-function render(){
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function goToDetailView(date) {
+  selectedDate = date;
+  currentView = 'detail';
+  backBtn.classList.add('show');
+  compose.classList.add('hidden');
+  entriesBox.style.display = 'none';
+  detailView.classList.add('show');
+  renderDetailView();
+}
+
+function goToListView() {
+  currentView = 'list';
+  backBtn.classList.remove('show');
+  compose.classList.remove('hidden');
+  entriesBox.style.display = 'flex';
+  detailView.classList.remove('show');
+}
+
+function renderDetailView() {
+  const sorted = [...entries].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+  const grouped = groupByDate(sorted);
+  const dayEntries = grouped[selectedDate] || [];
+  
+  detailTitle.textContent = selectedDate;
+  detailEntries.innerHTML = '';
+  
+  dayEntries.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).forEach(entry => {
+    const card = document.createElement('div');
+    card.className = 'detail-entry';
+    
+    const pairsHtml = entry.sentences.map((s, idx) => {
+      const key = entry.id + '_' + idx;
+      return `
+        <div class="sentence-pair">
+          <div class="entry-ko">${escapeHtml(s.ko)}</div>
+          <div class="mask" data-key="${key}"></div>
+          <div class="en-block" data-key="${key}">
+            <div class="entry-en">${escapeHtml(s.en)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    card.innerHTML = `
+      <div class="detail-entry-header">
+        <div class="detail-entry-time">${fmtTime(entry.createdAt)}</div>
+        <button class="detail-entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+      </div>
+      ${pairsHtml}
+      <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
+    `;
+    
+    card.querySelector('.detail-entry-del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(!confirm('이 항목을 삭제하시겠어요?')) return;
+      deleteEntry(entry.id).then(() => {
+        entries = entries.filter(en => en.id !== entry.id);
+        if(groupByDate(entries)[selectedDate]?.length === 0) {
+          goToListView();
+        }
+        renderDetailView();
+      }).catch(err => {
+        console.error(err);
+        alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
+      });
+    });
+    
+    detailEntries.appendChild(card);
+  });
+
+  // Event delegation for mask/en-block
+  detailEntries.addEventListener('click', (e) => {
+    const mask = e.target.closest('.mask');
+    if(mask){
+      e.stopPropagation();
+      const key = mask.dataset.key;
+      mask.classList.add('shown');
+      const block = detailEntries.querySelector(`.en-block[data-key="${key}"]`);
+      if(block) block.classList.add('shown');
+      return;
+    }
+    const block = e.target.closest('.en-block');
+    if(block){
+      e.stopPropagation();
+      block.classList.remove('shown');
+      const key = block.dataset.key;
+      const maskEl = detailEntries.querySelector(`.mask[data-key="${key}"]`);
+      if(maskEl) maskEl.classList.remove('shown');
+      return;
+    }
+  });
+}
+
+function renderListView(){
   entryCount.textContent = entries.length;
   entriesBox.innerHTML = '';
+  
   if(entries.length === 0){
     entriesBox.appendChild(emptyState);
     return;
@@ -560,39 +795,54 @@ function render(){
     const dateGroup = document.createElement('div');
     dateGroup.className = 'date-group';
     
-    const dateTitle = document.createElement('div');
-    dateTitle.className = 'date-group-title';
-    dateTitle.textContent = date;
-    dateGroup.appendChild(dateTitle);
+    const dayEntries = grouped[date].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+    const count = dayEntries.length;
+    
+    const header = document.createElement('div');
+    header.className = 'date-group-header';
+    header.innerHTML = `
+      <div class="date-group-toggle">▼</div>
+      <div class="date-group-title">${date}</div>
+      <div class="date-group-count">${count}개</div>
+    `;
+    header.addEventListener('click', () => toggleDateGroup(header));
+    dateGroup.appendChild(header);
     
     const entriesWrapper = document.createElement('div');
     entriesWrapper.className = 'date-group-entries';
     
-    const dayEntries = grouped[date].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
     dayEntries.forEach(entry => {
-      const card = document.createElement('div');
-      card.className = 'entry';
-      const pairsHtml = entry.sentences.map((s, idx) => {
-        const key = entry.id + '_' + idx;
-        return `
-          <div class="sentence-pair">
-            <div class="entry-ko">${escapeHtml(s.ko)}</div>
-            <div class="mask" data-key="${key}"></div>
-            <div class="en-block" data-key="${key}">
-              <div class="entry-en">${escapeHtml(s.en)}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      card.innerHTML = `
-        <div class="entry-top">
-          <div class="entry-time">${fmtTime(entry.createdAt)}</div>
-          <button class="entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+      const item = document.createElement('div');
+      item.className = 'entry-item';
+      
+      const preview = entry.sentences[0]?.ko || '(내용 없음)';
+      const previewText = preview.length > 35 ? preview.substring(0, 35) + '...' : preview;
+      
+      item.innerHTML = `
+        <div class="entry-item-content">
+          <div class="entry-item-time">${fmtTime(entry.createdAt)}</div>
+          <div class="entry-item-preview">${escapeHtml(previewText)}</div>
         </div>
-        ${pairsHtml}
-        <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
+        <button class="entry-item-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
       `;
-      entriesWrapper.appendChild(card);
+      
+      item.querySelector('.entry-item-content').addEventListener('click', () => {
+        goToDetailView(date);
+      });
+      
+      item.querySelector('.entry-item-del').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if(!confirm('이 항목을 삭제하시겠어요?')) return;
+        deleteEntry(entry.id).then(() => {
+          entries = entries.filter(en => en.id !== entry.id);
+          renderListView();
+        }).catch(err => {
+          console.error(err);
+          alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
+        });
+      });
+      
+      entriesWrapper.appendChild(item);
     });
     
     dateGroup.appendChild(entriesWrapper);
@@ -600,41 +850,14 @@ function render(){
   });
 }
 
-function escapeHtml(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+function toggleDateGroup(header) {
+  const group = header.closest('.date-group');
+  const entriesDiv = group.querySelector('.date-group-entries');
+  const toggle = header.querySelector('.date-group-toggle');
+  
+  entriesDiv.classList.toggle('collapsed');
+  toggle.classList.toggle('collapsed');
 }
-
-entriesBox.addEventListener('click', (e) => {
-  const mask = e.target.closest('.mask');
-  if(mask){
-    const key = mask.dataset.key;
-    mask.classList.add('shown');
-    const block = entriesBox.querySelector(`.en-block[data-key="${key}"]`);
-    if(block) block.classList.add('shown');
-    return;
-  }
-  const block = e.target.closest('.en-block');
-  if(block){
-    block.classList.remove('shown');
-    const key = block.dataset.key;
-    const maskEl = entriesBox.querySelector(`.mask[data-key="${key}"]`);
-    if(maskEl) maskEl.classList.remove('shown');
-    return;
-  }
-  const del = e.target.closest('.entry-del');
-  if(del){
-    const id = del.dataset.id;
-    deleteEntry(id).then(() => {
-      entries = entries.filter(en => en.id !== id);
-      render();
-    }).catch(err => {
-      console.error(err);
-      alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
-    });
-  }
-});
 
 function stripQuotes(str){
   return str.replace(/^["'"']+/, '').replace(/["'"']+$/, '').trim();
@@ -661,7 +884,6 @@ translateBtn.addEventListener('click', async () => {
   errMsg.style.display = 'none';
   pendingSentences = pairs;
   
-  // Check grammar for each English sentence
   const pairsWithCorrections = await Promise.all(pairs.map(async (p) => {
     const corrections = await checkEnglish(p.en);
     return { ...p, corrections };
@@ -703,7 +925,7 @@ saveBtn.addEventListener('click', async () => {
   try{
     await insertEntry(entry);
     entries.push(entry);
-    render();
+    renderListView();
     koInput.value = '';
     preview.style.display = 'none';
     pendingSentences = [];
@@ -715,6 +937,8 @@ saveBtn.addEventListener('click', async () => {
     saveBtn.disabled = false;
   }
 });
+
+backBtn.addEventListener('click', goToListView);
 
 createRoomBtn.addEventListener('click', createRoom);
 
