@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한 줄, 영어로</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAEADF;
+    --paper-line:#D8D8C8;
+    --card:#F4F4EC;
+    --ink:#1E2C22;
+    --ink-soft:#4B5A4E;
+    --ink-faint:#8A9088;
+    --wine:#7C3B49;
+    --wine-deep:#5A2A34;
+    --wine-tint:#F1E0E2;
+    --gold:#B08A3E;
+    --border:#CFCFBC;
+    --shadow:0 1px 0 rgba(30,44,34,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans KR', -apple-system, sans-serif;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:48px 24px 80px;
+  }
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:36px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:20px;
+  }
+  .brand{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:26px;
+    letter-spacing:-0.01em;
+  }
+  .brand .dot{color:var(--wine);}
+  .streak{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    text-align:right;
+  }
+  .streak b{color:var(--ink-soft); font-weight:500;}
+
+  /* compose card */
+  .compose{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:22px 24px 20px;
+    margin-bottom:44px;
+    position:relative;
+  }
+  .compose .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  textarea#koInput{
+    width:100%;
+    min-height:110px;
+    resize:vertical;
+    border:none;
+    background:transparent;
+    outline:none;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:17px;
+    line-height:1.9;
+    color:var(--ink);
+    padding:0;
+    background-image:repeating-linear-gradient(transparent, transparent 37px, var(--paper-line) 38px);
+  }
+  textarea#koInput::placeholder{color:var(--ink-faint);}
+
+  .compose-foot{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:14px;
+  }
+  button{
+    font-family:'Noto Sans KR', sans-serif;
+    cursor:pointer;
+    border:none;
+    background:none;
+  }
+  .btn-primary{
+    background:var(--ink);
+    color:var(--paper);
+    font-size:14px;
+    font-weight:500;
+    padding:10px 20px;
+    border-radius:3px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn-primary:hover{background:var(--wine-deep);}
+  .btn-primary:active{transform:scale(0.98);}
+  .btn-primary:disabled{background:var(--ink-faint); cursor:default;}
+  .btn-ghost{
+    font-size:13px;
+    color:var(--ink-faint);
+    padding:10px 10px;
+  }
+  .btn-ghost:hover{color:var(--ink-soft);}
+  .err-msg{
+    font-size:12px;
+    color:var(--wine);
+    margin-top:6px;
+    display:none;
+  }
+
+  /* preview after translation */
+  .preview{
+    display:none;
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px dashed var(--border);
+  }
+  .preview .label{color:var(--wine);}
+  .preview-pair{
+    margin-bottom:14px;
+  }
+  .preview-pair:last-child{margin-bottom:0;}
+  .preview-ko{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .preview-text{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    line-height:1.6;
+    color:var(--wine-deep);
+  }
+  .preview-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:14px;
+  }
+
+  /* list */
+  .list-head{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    margin:0 0 14px 2px;
+  }
+  .entries{display:flex; flex-direction:column; gap:12px;}
+  .empty{
+    font-size:14px;
+    color:var(--ink-faint);
+    padding:30px 4px;
+    border:1px dashed var(--border);
+    border-radius:4px;
+    text-align:center;
+  }
+  .entry{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:18px 20px;
+  }
+  .entry-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .entry-date{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    padding-top:2px;
+  }
+  .entry-del{
+    font-size:12px;
+    color:var(--ink-faint);
+    flex-shrink:0;
+  }
+  .entry-del:hover{color:var(--wine);}
+  .entry-ko{
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--ink);
+    white-space:pre-wrap;
+    margin-bottom:8px;
+  }
+  .sentence-pair{
+    margin-bottom:14px;
+  }
+  .sentence-pair:last-child{margin-bottom:0;}
+  .mask{
+    border-radius:3px;
+    cursor:pointer;
+    background:var(--ink);
+    height:38px;
+    transition:background .15s ease;
+  }
+  .mask:hover{background:var(--wine-deep);}
+  .en-block{
+    display:none;
+    padding:10px 14px;
+    background:var(--wine-tint);
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .en-block.shown{display:block;}
+  .mask.shown{display:none;}
+  .entry-en{
+    font-family:'Fraunces', serif;
+    font-size:15.5px;
+    line-height:1.7;
+    color:var(--wine-deep);
+  }
+  .hide-hint{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    margin-top:8px;
+  }
+  .share-bar{
+    display:none;
+    align-items:center;
+    gap:10px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:12px 14px;
+    margin-bottom:24px;
+  }
+  .share-bar .share-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    white-space:nowrap;
+  }
+  .share-bar input{
+    flex:1;
+    min-width:0;
+    border:1px solid var(--border);
+    background:var(--paper);
+    border-radius:3px;
+    padding:8px 10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .onboarding{
+    text-align:center;
+    padding:60px 20px;
+    border:1px dashed var(--border);
+    border-radius:4px;
+  }
+  .onboarding p{
+    font-size:14px;
+    color:var(--ink-soft);
+    line-height:1.7;
+    max-width:420px;
+    margin:0 auto 22px;
+  }
+  .onboarding input[type="email"]{
+    display:block;
+    width:100%;
+    max-width:320px;
+    margin:0 auto 14px;
+    border:1px solid var(--border);
+    background:var(--paper);
+    border-radius:3px;
+    padding:10px 12px;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    text-align:center;
+  }
+  .onboarding .warn{
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-top:14px;
+  }
+  .loading-dots::after{
+    content:'';
+    animation:dots 1.2s steps(4,end) infinite;
+  }
+  @keyframes dots{
+    0%{content:'';} 25%{content:'.';} 50%{content:'..';} 75%{content:'...';} 100%{content:'';}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">한 줄<span class="dot">,</span> 영어로</div>
+    <div class="streak" id="streakBox">기록 <b id="entryCount">0</b>개</div>
+  </header>
+
+  <div class="share-bar" id="shareBar">
+    <span class="share-label">공유 링크</span>
+    <input type="text" id="shareUrl" readonly>
+    <button class="btn-ghost" id="copyBtn">복사</button>
+  </div>
+
+  <div class="onboarding" id="onboarding">
+    <p>공유 노트를 새로 만들면 링크가 생겨요.<br>그 링크를 받은 사람은 누구나 같은 노트를 보고, 함께 쓸 수 있어요.</p>
+    <button class="btn-primary" id="createRoomBtn">공유 노트 만들기</button>
+    <div class="warn" id="onboardErr" style="display:none; color:var(--wine);"></div>
+    <p class="warn">이 링크를 아는 사람은 누구나 보고 지울 수 있으니, 민감한 내용은 적지 마세요.</p>
+  </div>
+
+  <div id="appMain" style="display:none;">
+
+  <section class="compose">
+    <div class="label">한글 문장 다음 줄에 영어 문장을 써주세요 (한글, 영어 번갈아가며)</div>
+    <textarea id="koInput" placeholder='나는 어제 퇴사를 했다. 그리고 퇴사 후 첫 아침을 맞았다.
+"I quit my job yesterday, and I woke up to my first morning after leaving."
+아침부터 일찍 눈을 떴고, 부지런한 나만의 생활 방식을 찾고자 했다.
+"I woke up early and wanted to build a productive routine for myself."'></textarea>
+    <div class="err-msg" id="errMsg">한글 문장 다음 줄에 영어 문장을 써주세요. 줄 수가 짝이 맞아야 해요.</div>
+    <div class="compose-foot">
+      <button class="btn-primary" id="translateBtn">확인하기</button>
+    </div>
+
+    <div class="preview" id="preview">
+      <div class="label">이렇게 저장돼요</div>
+      <div id="previewList"></div>
+      <div class="preview-actions">
+        <button class="btn-ghost" id="discardBtn">취소</button>
+        <button class="btn-primary" id="saveBtn">노트에 저장</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="list-head">지난 기록 <span style="text-transform:none; letter-spacing:0; color:var(--ink-faint);">· 이 링크를 여는 모든 사람과 공유됩니다</span></div>
+  <div class="entries" id="entries">
+    <div class="empty" id="emptyState">아직 저장된 노트가 없어요. 위에서 오늘의 문장을 적어보세요.</div>
+  </div>
+
+  </div>
+
+</div>
+
+<script>
+const koInput = document.getElementById('koInput');
+const translateBtn = document.getElementById('translateBtn');
+const errMsg = document.getElementById('errMsg');
+const preview = document.getElementById('preview');
+const previewList = document.getElementById('previewList');
+const discardBtn = document.getElementById('discardBtn');
+const saveBtn = document.getElementById('saveBtn');
+const entriesBox = document.getElementById('entries');
+const emptyState = document.getElementById('emptyState');
+const entryCount = document.getElementById('entryCount');
+const onboarding = document.getElementById('onboarding');
+const onboardErr = document.getElementById('onboardErr');
+const createRoomBtn = document.getElementById('createRoomBtn');
+const appMain = document.getElementById('appMain');
+const shareBar = document.getElementById('shareBar');
+const shareUrl = document.getElementById('shareUrl');
+const copyBtn = document.getElementById('copyBtn');
+
+let pendingSentences = [];
+let entries = [];
+let roomId = null;
+
+function fmtDate(iso){
+  const d = new Date(iso);
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
+}
+
+// ===== Supabase 설정: 아래 두 값을 본인의 프로젝트 값으로 바꿔주세요 =====
+const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+// ======================================================================
+
+const SB_HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json'
+};
+
+function showApp(){
+  onboarding.style.display = 'none';
+  shareBar.style.display = 'flex';
+  appMain.style.display = 'block';
+  shareUrl.value = window.location.href;
+}
+
+function genRoomId(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID().slice(0, 12);
+  return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function createRoom(){
+  onboardErr.style.display = 'none';
+  const id = genRoomId();
+  const url = new URL(window.location.href);
+  url.searchParams.set('room', id);
+  window.history.replaceState({}, '', url.toString());
+  roomId = id;
+  entries = [];
+  showApp();
+  render();
+}
+
+async function loadEntries(){
+  try{
+    const url = `${SUPABASE_URL}/rest/v1/entries?room_id=eq.${encodeURIComponent(roomId)}&order=created_at.desc`;
+    const res = await fetch(url, { headers: SB_HEADERS });
+    if(!res.ok) throw new Error('load failed: ' + res.status);
+    const rows = await res.json();
+    entries = rows.map(r => ({ id: r.id, sentences: r.sentences, createdAt: r.created_at }));
+  }catch(e){
+    console.error(e);
+    entries = [];
+  }
+  render();
+}
+
+async function insertEntry(entry){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/entries`, {
+    method: 'POST',
+    headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+    body: JSON.stringify({
+      id: entry.id,
+      room_id: roomId,
+      sentences: entry.sentences,
+      created_at: entry.createdAt
+    })
+  });
+  if(!res.ok) throw new Error('insert failed: ' + res.status);
+}
+
+async function deleteEntry(id){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/entries?id=eq.${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: SB_HEADERS
+  });
+  if(!res.ok) throw new Error('delete failed: ' + res.status);
+}
+
+function render(){
+  entryCount.textContent = entries.length;
+  entriesBox.innerHTML = '';
+  if(entries.length === 0){
+    entriesBox.appendChild(emptyState);
+    return;
+  }
+  const sorted = [...entries].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+  sorted.forEach(entry => {
+    const card = document.createElement('div');
+    card.className = 'entry';
+    const pairsHtml = entry.sentences.map((s, idx) => {
+      const key = entry.id + '_' + idx;
+      return `
+        <div class="sentence-pair">
+          <div class="entry-ko">${escapeHtml(s.ko)}</div>
+          <div class="mask" data-key="${key}"></div>
+          <div class="en-block" data-key="${key}">
+            <div class="entry-en">${escapeHtml(s.en)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    card.innerHTML = `
+      <div class="entry-top">
+        <div class="entry-date">${fmtDate(entry.createdAt)}</div>
+        <button class="entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+      </div>
+      ${pairsHtml}
+      <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
+    `;
+    entriesBox.appendChild(card);
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+entriesBox.addEventListener('click', (e) => {
+  const mask = e.target.closest('.mask');
+  if(mask){
+    const key = mask.dataset.key;
+    mask.classList.add('shown');
+    const block = entriesBox.querySelector(`.en-block[data-key="${key}"]`);
+    if(block) block.classList.add('shown');
+    return;
+  }
+  const block = e.target.closest('.en-block');
+  if(block){
+    block.classList.remove('shown');
+    const key = block.dataset.key;
+    const maskEl = entriesBox.querySelector(`.mask[data-key="${key}"]`);
+    if(maskEl) maskEl.classList.remove('shown');
+    return;
+  }
+  const del = e.target.closest('.entry-del');
+  if(del){
+    const id = del.dataset.id;
+    deleteEntry(id).then(() => {
+      entries = entries.filter(en => en.id !== id);
+      render();
+    }).catch(err => {
+      console.error(err);
+      alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
+    });
+  }
+});
+
+function stripQuotes(str){
+  return str.replace(/^["'“‘]+/, '').replace(/["'”’]+$/, '').trim();
+}
+
+function parsePairs(raw){
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  if(lines.length === 0) return { error: '한글 문장 다음 줄에 영어 문장을 써주세요.' };
+  if(lines.length % 2 !== 0) return { error: '줄 수가 짝이 맞지 않아요. 한글 한 줄, 영어 한 줄씩 번갈아 써주세요.' };
+  const pairs = [];
+  for(let i = 0; i < lines.length; i += 2){
+    pairs.push({ ko: lines[i], en: stripQuotes(lines[i+1]) });
+  }
+  return { pairs };
+}
+
+translateBtn.addEventListener('click', () => {
+  const { pairs, error } = parsePairs(koInput.value);
+  if(error){
+    errMsg.textContent = error;
+    errMsg.style.display = 'block';
+    return;
+  }
+  errMsg.style.display = 'none';
+  pendingSentences = pairs;
+  previewList.innerHTML = pairs.map(p => `
+    <div class="preview-pair">
+      <div class="preview-ko">${escapeHtml(p.ko)}</div>
+      <div class="preview-text">${escapeHtml(p.en)}</div>
+    </div>
+  `).join('');
+  preview.style.display = 'block';
+});
+
+discardBtn.addEventListener('click', () => {
+  preview.style.display = 'none';
+  pendingSentences = [];
+});
+
+saveBtn.addEventListener('click', async () => {
+  if(pendingSentences.length === 0) return;
+  const entry = {
+    id: 'e_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+    sentences: pendingSentences,
+    createdAt: new Date().toISOString()
+  };
+  saveBtn.disabled = true;
+  try{
+    await insertEntry(entry);
+    entries.push(entry);
+    render();
+    koInput.value = '';
+    preview.style.display = 'none';
+    pendingSentences = [];
+  }catch(e){
+    console.error(e);
+    errMsg.textContent = '저장하지 못했어요. Supabase 설정(URL/키)을 확인해주세요.';
+    errMsg.style.display = 'block';
+  }finally{
+    saveBtn.disabled = false;
+  }
+});
+
+createRoomBtn.addEventListener('click', createRoom);
+
+copyBtn.addEventListener('click', async () => {
+  try{
+    await navigator.clipboard.writeText(shareUrl.value);
+    copyBtn.textContent = '복사됨';
+    setTimeout(() => { copyBtn.textContent = '복사'; }, 1500);
+  }catch(e){
+    shareUrl.select();
+  }
+});
+
+(function init(){
+  const params = new URLSearchParams(window.location.search);
+  const existingRoom = params.get('room');
+  if(existingRoom){
+    roomId = existingRoom;
+    showApp();
+    loadEntries();
+  }
+})();
+</script>
+</body>
+</html>
