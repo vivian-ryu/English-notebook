@@ -409,7 +409,27 @@ function showApp(){
   shareBar.style.display = 'flex';
   appMain.style.display = 'block';
   shareUrl.value = window.location.href;
-}
+(function init(){
+  const params = new URLSearchParams(window.location.search);
+  const existingRoom = params.get('room');
+  if(existingRoom){
+    roomId = existingRoom;
+    showApp();
+    loadEntries();
+  }
+  // ===== 추가: 저장된 roomId가 있으면 자동으로 로드 =====
+  else {
+    const savedRoomId = localStorage.getItem('lastRoomId');
+    if(savedRoomId){
+      roomId = savedRoomId;
+      const url = new URL(window.location.href);
+      url.searchParams.set('room', savedRoomId);
+      window.history.replaceState({}, '', url.toString());
+      showApp();
+      loadEntries();
+    }
+  }
+})();}
 
 function genRoomId(){
   if(window.crypto && crypto.randomUUID) return crypto.randomUUID().slice(0, 12);
@@ -423,6 +443,7 @@ function createRoom(){
   url.searchParams.set('room', id);
   window.history.replaceState({}, '', url.toString());
   roomId = id;
+  localStorage.setItem('lastRoomId', id);
   entries = [];
   showApp();
   render();
