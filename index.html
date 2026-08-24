@@ -20,6 +20,8 @@
     --gold:#B08A3E;
     --border:#CFCFBC;
     --shadow:0 1px 0 rgba(30,44,34,0.06);
+    --correction:#E8F5E9;
+    --correction-border:#A5D6A7;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -137,19 +139,35 @@
   }
   .preview .label{color:var(--wine);}
   .preview-pair{
-    margin-bottom:14px;
+    margin-bottom:18px;
   }
   .preview-pair:last-child{margin-bottom:0;}
   .preview-ko{
     font-size:14.5px;
     color:var(--ink-soft);
-    margin-bottom:4px;
+    margin-bottom:6px;
   }
   .preview-text{
     font-family:'Fraunces', serif;
     font-size:17px;
     line-height:1.6;
     color:var(--wine-deep);
+    margin-bottom:8px;
+  }
+  .preview-correction{
+    background:var(--correction);
+    border:1px solid var(--correction-border);
+    border-radius:3px;
+    padding:10px 12px;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink);
+    display:none;
+  }
+  .preview-correction.show{display:block;}
+  .preview-correction strong{
+    color:var(--wine-deep);
+    font-weight:600;
   }
   .preview-actions{
     display:flex;
@@ -167,7 +185,7 @@
     text-transform:uppercase;
     margin:0 0 14px 2px;
   }
-  .entries{display:flex; flex-direction:column; gap:12px;}
+  .entries{display:flex; flex-direction:column; gap:20px;}
   .empty{
     font-size:14px;
     color:var(--ink-faint);
@@ -175,6 +193,23 @@
     border:1px dashed var(--border);
     border-radius:4px;
     text-align:center;
+  }
+  .date-group{
+    border-left:3px solid var(--border);
+    padding-left:16px;
+  }
+  .date-group-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+    letter-spacing:0.05em;
+  }
+  .date-group-entries{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
   }
   .entry{
     background:var(--card);
@@ -189,7 +224,7 @@
     gap:12px;
     margin-bottom:10px;
   }
-  .entry-date{
+  .entry-time{
     font-family:'IBM Plex Mono', monospace;
     font-size:11.5px;
     color:var(--ink-faint);
@@ -199,6 +234,7 @@
     font-size:12px;
     color:var(--ink-faint);
     flex-shrink:0;
+    cursor:pointer;
   }
   .entry-del:hover{color:var(--wine);}
   .entry-ko{
@@ -336,10 +372,10 @@
 
   <section class="compose">
     <div class="label">한글 문장 다음 줄에 영어 문장을 써주세요 (한글, 영어 번갈아가며)</div>
-    <textarea id="koInput" placeholder='나는 어제 퇴사를 했다. 그리고 퇴사 후 첫 아침을 맞았다.
-"I quit my job yesterday, and I woke up to my first morning after leaving."
-아침부터 일찍 눈을 떴고, 부지런한 나만의 생활 방식을 찾고자 했다.
-"I woke up early and wanted to build a productive routine for myself."'></textarea>
+    <textarea id="koInput" placeholder='나는 매일 영어 공부를 한다.
+I study English every single day.
+매일 아침 30분씩 공부하는 것이 목표다.
+My goal is to study for 30 minutes every morning.'></textarea>
     <div class="err-msg" id="errMsg">한글 문장 다음 줄에 영어 문장을 써주세요. 줄 수가 짝이 맞아야 해요.</div>
     <div class="compose-foot">
       <button class="btn-primary" id="translateBtn">확인하기</button>
@@ -390,7 +426,12 @@ let roomId = null;
 function fmtDate(iso){
   const d = new Date(iso);
   const days = ['일','월','화','수','목','금','토'];
-  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function fmtTime(iso){
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 // ===== Supabase 설정: 아래 두 값을 본인의 프로젝트 값으로 바꿔주세요 =====
@@ -403,6 +444,33 @@ const SB_HEADERS = {
   'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
   'Content-Type': 'application/json'
 };
+
+// Simple grammar/spell check using LanguageTool API
+async function checkEnglish(text) {
+  try {
+    const response = await fetch('https://api.languagetool.org/v2/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        text: text,
+        language: 'en-US'
+      })
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (data.matches && data.matches.length > 0) {
+      return data.matches.map(m => ({
+        message: m.message,
+        replacement: m.replacements.length > 0 ? m.replacements[0].value : null,
+        offset: m.offset,
+        length: m.length
+      }));
+    }
+  } catch (e) {
+    console.error('Grammar check failed:', e);
+  }
+  return null;
+}
 
 function showApp(){
   onboarding.style.display = 'none';
@@ -465,6 +533,18 @@ async function deleteEntry(id){
   if(!res.ok) throw new Error('delete failed: ' + res.status);
 }
 
+function groupByDate(entries) {
+  const groups = {};
+  entries.forEach(entry => {
+    const date = fmtDate(entry.createdAt);
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(entry);
+  });
+  return groups;
+}
+
 function render(){
   entryCount.textContent = entries.length;
   entriesBox.innerHTML = '';
@@ -472,31 +552,51 @@ function render(){
     entriesBox.appendChild(emptyState);
     return;
   }
+  
   const sorted = [...entries].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
-  sorted.forEach(entry => {
-    const card = document.createElement('div');
-    card.className = 'entry';
-    const pairsHtml = entry.sentences.map((s, idx) => {
-      const key = entry.id + '_' + idx;
-      return `
-        <div class="sentence-pair">
-          <div class="entry-ko">${escapeHtml(s.ko)}</div>
-          <div class="mask" data-key="${key}"></div>
-          <div class="en-block" data-key="${key}">
-            <div class="entry-en">${escapeHtml(s.en)}</div>
+  const grouped = groupByDate(sorted);
+  
+  Object.keys(grouped).sort().reverse().forEach(date => {
+    const dateGroup = document.createElement('div');
+    dateGroup.className = 'date-group';
+    
+    const dateTitle = document.createElement('div');
+    dateTitle.className = 'date-group-title';
+    dateTitle.textContent = date;
+    dateGroup.appendChild(dateTitle);
+    
+    const entriesWrapper = document.createElement('div');
+    entriesWrapper.className = 'date-group-entries';
+    
+    const dayEntries = grouped[date].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+    dayEntries.forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'entry';
+      const pairsHtml = entry.sentences.map((s, idx) => {
+        const key = entry.id + '_' + idx;
+        return `
+          <div class="sentence-pair">
+            <div class="entry-ko">${escapeHtml(s.ko)}</div>
+            <div class="mask" data-key="${key}"></div>
+            <div class="en-block" data-key="${key}">
+              <div class="entry-en">${escapeHtml(s.en)}</div>
+            </div>
           </div>
+        `;
+      }).join('');
+      card.innerHTML = `
+        <div class="entry-top">
+          <div class="entry-time">${fmtTime(entry.createdAt)}</div>
+          <button class="entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
         </div>
+        ${pairsHtml}
+        <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
       `;
-    }).join('');
-    card.innerHTML = `
-      <div class="entry-top">
-        <div class="entry-date">${fmtDate(entry.createdAt)}</div>
-        <button class="entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
-      </div>
-      ${pairsHtml}
-      <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
-    `;
-    entriesBox.appendChild(card);
+      entriesWrapper.appendChild(card);
+    });
+    
+    dateGroup.appendChild(entriesWrapper);
+    entriesBox.appendChild(dateGroup);
   });
 }
 
@@ -551,7 +651,7 @@ function parsePairs(raw){
   return { pairs };
 }
 
-translateBtn.addEventListener('click', () => {
+translateBtn.addEventListener('click', async () => {
   const { pairs, error } = parsePairs(koInput.value);
   if(error){
     errMsg.textContent = error;
@@ -560,10 +660,28 @@ translateBtn.addEventListener('click', () => {
   }
   errMsg.style.display = 'none';
   pendingSentences = pairs;
-  previewList.innerHTML = pairs.map(p => `
+  
+  // Check grammar for each English sentence
+  const pairsWithCorrections = await Promise.all(pairs.map(async (p) => {
+    const corrections = await checkEnglish(p.en);
+    return { ...p, corrections };
+  }));
+  
+  previewList.innerHTML = pairsWithCorrections.map((p, idx) => `
     <div class="preview-pair">
       <div class="preview-ko">${escapeHtml(p.ko)}</div>
       <div class="preview-text">${escapeHtml(p.en)}</div>
+      ${p.corrections && p.corrections.length > 0 ? `
+        <div class="preview-correction show">
+          <strong>💡 제안:</strong><br>
+          ${p.corrections.map(c => `
+            <div style="margin-top:6px;">
+              <strong>${c.message}</strong><br>
+              ${c.replacement ? `제안: "<strong>${c.replacement}</strong>"` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
     </div>
   `).join('');
   preview.style.display = 'block';
