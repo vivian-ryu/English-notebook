@@ -691,7 +691,7 @@ async function updateEntryDate(id, newIso){
 }
 
 function checkPassword() {
-  const pwd = prompt('삭제하시려면 비밀번호를 입력하세요 (힌트: 5604):');
+  const pwd = prompt('삭제하시려면 비밀번호를 입력하세요');
   if (pwd !== '5604') {
     if (pwd !== null) alert('비밀번호가 일치하지 않습니다.');
     return false;
