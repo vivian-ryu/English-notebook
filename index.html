@@ -73,7 +73,6 @@
   .back-btn:hover{background:rgba(30,44,34,0.05);}
   .back-btn.show{display:block;}
 
-  /* compose card */
   .compose{
     background:var(--card);
     border:1px solid var(--border);
@@ -145,7 +144,6 @@
     display:none;
   }
 
-  /* preview after translation */
   .preview{
     display:none;
     margin-top:18px;
@@ -191,7 +189,6 @@
     margin-top:14px;
   }
 
-  /* list page */
   .list-head{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
@@ -263,7 +260,6 @@
     padding:0 16px;
   }
 
-  /* entry item */
   .entry-item{
     background:var(--card);
     border:1px solid var(--border);
@@ -300,7 +296,6 @@
   }
   .entry-item-del:hover{color:var(--wine);}
 
-  /* detail page */
   .detail-view{
     display:none;
   }
@@ -363,12 +358,19 @@
     font-size:11.5px;
     color:var(--ink-faint);
   }
+  .detail-entry-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .detail-entry-edit,
   .detail-entry-del{
     font-size:12px;
     color:var(--ink-faint);
     cursor:pointer;
     padding:4px;
   }
+  .detail-entry-edit:hover{color:var(--ink-soft);}
   .detail-entry-del:hover{color:var(--wine);}
   .entry-ko{
     font-size:15px;
@@ -410,6 +412,33 @@
     font-size:10px;
     color:var(--ink-faint);
     margin-top:8px;
+  }
+
+  .edit-textarea{
+    width:100%;
+    min-height:100px;
+    resize:vertical;
+    border:1px solid var(--border);
+    background:var(--paper);
+    border-radius:3px;
+    outline:none;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:14.5px;
+    line-height:1.8;
+    color:var(--ink);
+    padding:10px 12px;
+    margin-bottom:10px;
+  }
+  .edit-err{
+    font-size:12px;
+    color:var(--wine);
+    margin-bottom:8px;
+    display:none;
+  }
+  .edit-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
   }
 
   .share-bar{
@@ -454,20 +483,6 @@
     max-width:420px;
     margin:0 auto 22px;
   }
-  .onboarding input[type="email"]{
-    display:block;
-    width:100%;
-    max-width:320px;
-    margin:0 auto 14px;
-    border:1px solid var(--border);
-    background:var(--paper);
-    border-radius:3px;
-    padding:10px 12px;
-    font-family:'Noto Sans KR', sans-serif;
-    font-size:14px;
-    color:var(--ink);
-    text-align:center;
-  }
   .onboarding .warn{
     font-size:12px;
     color:var(--ink-faint);
@@ -506,7 +521,6 @@
 
   <div id="appMain" style="display:none;">
 
-  <!-- Page 1: List View -->
   <section class="compose" id="compose">
     <div class="label">한글 문장 다음 줄에 영어 문장을 써주세요 (한글, 영어 번갈아가며)</div>
     <textarea id="koInput" placeholder='나는 매일 영어 공부를 한다.
@@ -533,7 +547,6 @@ My goal is to study for 30 minutes every morning.'></textarea>
     <div class="empty" id="emptyState">아직 저장된 노트가 없어요. 위에서 오늘의 문장을 적어보세요.</div>
   </div>
 
-  <!-- Page 2: Detail View -->
   <div class="detail-view" id="detailView">
     <div class="detail-header">
       <div class="detail-title" id="detailTitle"></div>
@@ -572,8 +585,9 @@ const detailEntries = document.getElementById('detailEntries');
 let pendingSentences = [];
 let entries = [];
 let roomId = null;
-let currentView = 'list'; // 'list' or 'detail'
+let currentView = 'list';
 let selectedDate = null;
+let editingEntryId = null;
 
 function fmtDate(iso){
   const d = new Date(iso);
@@ -690,6 +704,15 @@ async function updateEntryDate(id, newIso){
   if(!res.ok) throw new Error('update failed: ' + res.status);
 }
 
+async function updateEntrySentences(id, sentences){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/entries?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ sentences })
+  });
+  if(!res.ok) throw new Error('update failed: ' + res.status);
+}
+
 function checkPassword() {
   const pwd = prompt('삭제하시려면 비밀번호를 입력하세요');
   if (pwd !== '5604') {
@@ -717,9 +740,14 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
+function entryToRawText(entry){
+  return entry.sentences.map(s => `${s.ko}\n${s.en}`).join('\n');
+}
+
 function goToDetailView(date) {
   selectedDate = date;
   currentView = 'detail';
+  editingEntryId = null;
   backBtn.classList.add('show');
   compose.classList.add('hidden');
   entriesBox.style.display = 'none';
@@ -729,6 +757,7 @@ function goToDetailView(date) {
 
 function goToListView() {
   currentView = 'list';
+  editingEntryId = null;
   backBtn.classList.remove('show');
   compose.classList.remove('hidden');
   entriesBox.style.display = 'flex';
@@ -747,6 +776,55 @@ function renderDetailView() {
   dayEntries.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).forEach(entry => {
     const card = document.createElement('div');
     card.className = 'detail-entry';
+
+    if(editingEntryId === entry.id){
+      card.innerHTML = `
+        <div class="detail-entry-header">
+          <div class="detail-entry-date">${fmtDate(entry.createdAt)} · 수정 중</div>
+        </div>
+        <textarea class="edit-textarea">${escapeHtml(entryToRawText(entry))}</textarea>
+        <div class="edit-err"></div>
+        <div class="edit-actions">
+          <button class="btn-ghost edit-cancel">취소</button>
+          <button class="btn-primary edit-save">저장</button>
+        </div>
+      `;
+
+      const textarea = card.querySelector('.edit-textarea');
+      const editErr = card.querySelector('.edit-err');
+
+      card.querySelector('.edit-cancel').addEventListener('click', () => {
+        editingEntryId = null;
+        renderDetailView();
+      });
+
+      card.querySelector('.edit-save').addEventListener('click', async (btnEvent) => {
+        const { pairs, error } = parsePairs(textarea.value);
+        if(error){
+          editErr.textContent = error;
+          editErr.style.display = 'block';
+          return;
+        }
+        const btn = btnEvent.currentTarget;
+        btn.disabled = true;
+        btn.textContent = '저장 중...';
+        try{
+          await updateEntrySentences(entry.id, pairs);
+          entry.sentences = pairs;
+          editingEntryId = null;
+          renderDetailView();
+        }catch(err){
+          console.error(err);
+          editErr.textContent = '저장하지 못했어요. 잠시 후 다시 시도해주세요.';
+          editErr.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '저장';
+        }
+      });
+
+      detailEntries.appendChild(card);
+      return;
+    }
     
     const pairsHtml = entry.sentences.map((s, idx) => {
       const key = entry.id + '_' + idx;
@@ -767,11 +845,20 @@ function renderDetailView() {
           <span class="date-text" title="날짜 수정">${fmtDate(entry.createdAt)}</span>
           <input type="date" class="date-input" style="display:none;" value="${getLocalDateString(entry.createdAt)}">
         </div>
-        <button class="detail-entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+        <div class="detail-entry-actions">
+          <button class="detail-entry-edit" data-id="${entry.id}" aria-label="수정">수정</button>
+          <button class="detail-entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+        </div>
       </div>
       ${pairsHtml}
       <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
     `;
+
+    card.querySelector('.detail-entry-edit').addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingEntryId = entry.id;
+      renderDetailView();
+    });
     
     card.querySelector('.detail-entry-del').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -831,7 +918,6 @@ function renderDetailView() {
     detailEntries.appendChild(card);
   });
 
-  // Event delegation for mask/en-block
   detailEntries.addEventListener('click', (e) => {
     const mask = e.target.closest('.mask');
     if(mask){
@@ -934,7 +1020,7 @@ function toggleDateGroup(header) {
 }
 
 function stripQuotes(str){
-  return str.replace(/^["'"']+/, '').replace(/["'"']+$/, '').trim();
+  return str.replace(/^["'“‘]+/, '').replace(/["'”’]+$/, '').trim();
 }
 
 function parsePairs(raw){
