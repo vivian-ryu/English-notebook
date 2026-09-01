@@ -363,14 +363,12 @@
     align-items:center;
     gap:10px;
   }
-  .detail-entry-edit,
   .detail-entry-del{
     font-size:12px;
     color:var(--ink-faint);
     cursor:pointer;
     padding:4px;
   }
-  .detail-entry-edit:hover{color:var(--ink-soft);}
   .detail-entry-del:hover{color:var(--wine);}
   .entry-ko{
     font-size:15px;
@@ -378,6 +376,12 @@
     color:var(--ink);
     white-space:pre-wrap;
     margin-bottom:10px;
+    cursor:pointer;
+    border-bottom:1px dashed transparent;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .entry-ko:hover{
+    border-bottom-color:var(--ink-faint);
   }
   .sentence-pair{
     margin-bottom:14px;
@@ -428,6 +432,33 @@
     color:var(--ink);
     padding:10px 12px;
     margin-bottom:10px;
+  }
+  .edit-ko, .edit-en{
+    width:100%;
+    resize:vertical;
+    border:1px solid var(--border);
+    background:var(--paper);
+    border-radius:3px;
+    outline:none;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--ink);
+    padding:8px 10px;
+    margin-bottom:6px;
+    min-height:44px;
+  }
+  .edit-en{
+    font-family:'Fraunces', serif;
+    min-height:44px;
+  }
+  .edit-field-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    margin-bottom:3px;
   }
   .edit-err{
     font-size:12px;
@@ -587,7 +618,7 @@ let entries = [];
 let roomId = null;
 let currentView = 'list';
 let selectedDate = null;
-let editingEntryId = null;
+let editingSentenceKey = null; // format: `${entryId}_${idx}`
 
 function fmtDate(iso){
   const d = new Date(iso);
@@ -698,19 +729,23 @@ async function deleteEntry(id){
 async function updateEntryDate(id, newIso){
   const res = await fetch(`${SUPABASE_URL}/rest/v1/entries?id=eq.${encodeURIComponent(id)}`, {
     method: 'PATCH',
-    headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+    headers: { ...SB_HEADERS, 'Prefer': 'return=representation' },
     body: JSON.stringify({ created_at: newIso })
   });
   if(!res.ok) throw new Error('update failed: ' + res.status);
+  const rows = await res.json();
+  if(!Array.isArray(rows) || rows.length === 0) throw new Error('no rows updated (RLS policy?)');
 }
 
 async function updateEntrySentences(id, sentences){
   const res = await fetch(`${SUPABASE_URL}/rest/v1/entries?id=eq.${encodeURIComponent(id)}`, {
     method: 'PATCH',
-    headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+    headers: { ...SB_HEADERS, 'Prefer': 'return=representation' },
     body: JSON.stringify({ sentences })
   });
   if(!res.ok) throw new Error('update failed: ' + res.status);
+  const rows = await res.json();
+  if(!Array.isArray(rows) || rows.length === 0) throw new Error('no rows updated (RLS policy?)');
 }
 
 function checkPassword() {
@@ -747,7 +782,7 @@ function entryToRawText(entry){
 function goToDetailView(date) {
   selectedDate = date;
   currentView = 'detail';
-  editingEntryId = null;
+  editingSentenceKey = null;
   backBtn.classList.add('show');
   compose.classList.add('hidden');
   entriesBox.style.display = 'none';
@@ -757,7 +792,7 @@ function goToDetailView(date) {
 
 function goToListView() {
   currentView = 'list';
-  editingEntryId = null;
+  editingSentenceKey = null;
   backBtn.classList.remove('show');
   compose.classList.remove('hidden');
   entriesBox.style.display = 'flex';
@@ -777,41 +812,89 @@ function renderDetailView() {
     const card = document.createElement('div');
     card.className = 'detail-entry';
 
-    if(editingEntryId === entry.id){
-      card.innerHTML = `
-        <div class="detail-entry-header">
-          <div class="detail-entry-date">${fmtDate(entry.createdAt)} · 수정 중</div>
-        </div>
-        <textarea class="edit-textarea">${escapeHtml(entryToRawText(entry))}</textarea>
-        <div class="edit-err"></div>
-        <div class="edit-actions">
-          <button class="btn-ghost edit-cancel">취소</button>
-          <button class="btn-primary edit-save">저장</button>
+    const pairsHtml = entry.sentences.map((s, idx) => {
+      const key = entry.id + '_' + idx;
+      if(editingSentenceKey === key){
+        return `
+          <div class="sentence-pair" data-editing-key="${key}">
+            <div class="edit-field-label">한글</div>
+            <textarea class="edit-ko">${escapeHtml(s.ko)}</textarea>
+            <div class="edit-field-label">영어</div>
+            <textarea class="edit-en">${escapeHtml(s.en)}</textarea>
+            <div class="edit-err"></div>
+            <div class="edit-actions">
+              <button class="btn-ghost sentence-edit-cancel">취소</button>
+              <button class="btn-primary sentence-edit-save">저장</button>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div class="sentence-pair">
+          <div class="entry-ko" data-key="${key}" title="클릭해서 이 문장만 수정">${escapeHtml(s.ko)}</div>
+          <div class="mask" data-key="${key}"></div>
+          <div class="en-block" data-key="${key}">
+            <div class="entry-en">${escapeHtml(s.en)}</div>
+          </div>
         </div>
       `;
+    }).join('');
 
-      const textarea = card.querySelector('.edit-textarea');
-      const editErr = card.querySelector('.edit-err');
+    card.innerHTML = `
+      <div class="detail-entry-header">
+        <div class="detail-entry-date" data-id="${entry.id}">
+          <span class="date-text" title="날짜 수정">${fmtDate(entry.createdAt)}</span>
+          <input type="date" class="date-input" style="display:none;" value="${getLocalDateString(entry.createdAt)}">
+        </div>
+        <div class="detail-entry-actions">
+          <button class="detail-entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+        </div>
+      </div>
+      ${pairsHtml}
+      <div class="hide-hint">문장을 누르면 영어가 나타나고, 한글 문장을 누르면 그 문장만 수정할 수 있어요</div>
+    `;
 
-      card.querySelector('.edit-cancel').addEventListener('click', () => {
-        editingEntryId = null;
+    // 문장별 수정: 한글 문장을 클릭하면 그 문장만 편집 모드로
+    card.querySelectorAll('.entry-ko').forEach(koEl => {
+      koEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        editingSentenceKey = koEl.dataset.key;
+        renderDetailView();
+      });
+    });
+
+    // 편집 중인 문장의 저장/취소 처리
+    const editingBlock = card.querySelector('.sentence-pair[data-editing-key]');
+    if(editingBlock){
+      const key = editingBlock.dataset.editingKey;
+      const idx = parseInt(key.split('_').pop(), 10);
+      const koTextarea = editingBlock.querySelector('.edit-ko');
+      const enTextarea = editingBlock.querySelector('.edit-en');
+      const editErr = editingBlock.querySelector('.edit-err');
+
+      editingBlock.querySelector('.sentence-edit-cancel').addEventListener('click', (e) => {
+        e.stopPropagation();
+        editingSentenceKey = null;
         renderDetailView();
       });
 
-      card.querySelector('.edit-save').addEventListener('click', async (btnEvent) => {
-        const { pairs, error } = parsePairs(textarea.value);
-        if(error){
-          editErr.textContent = error;
+      editingBlock.querySelector('.sentence-edit-save').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const newKo = koTextarea.value.trim();
+        const newEn = stripQuotes(enTextarea.value.trim());
+        if(!newKo || !newEn){
+          editErr.textContent = '한글과 영어 문장을 모두 입력해주세요.';
           editErr.style.display = 'block';
           return;
         }
-        const btn = btnEvent.currentTarget;
+        const btn = e.currentTarget;
         btn.disabled = true;
         btn.textContent = '저장 중...';
+        const updatedSentences = entry.sentences.map((s, i) => i === idx ? { ko: newKo, en: newEn } : s);
         try{
-          await updateEntrySentences(entry.id, pairs);
-          entry.sentences = pairs;
-          editingEntryId = null;
+          await updateEntrySentences(entry.id, updatedSentences);
+          entry.sentences = updatedSentences;
+          editingSentenceKey = null;
           renderDetailView();
         }catch(err){
           console.error(err);
@@ -821,45 +904,8 @@ function renderDetailView() {
           btn.textContent = '저장';
         }
       });
-
-      detailEntries.appendChild(card);
-      return;
     }
-    
-    const pairsHtml = entry.sentences.map((s, idx) => {
-      const key = entry.id + '_' + idx;
-      return `
-        <div class="sentence-pair">
-          <div class="entry-ko">${escapeHtml(s.ko)}</div>
-          <div class="mask" data-key="${key}"></div>
-          <div class="en-block" data-key="${key}">
-            <div class="entry-en">${escapeHtml(s.en)}</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-    
-    card.innerHTML = `
-      <div class="detail-entry-header">
-        <div class="detail-entry-date" data-id="${entry.id}">
-          <span class="date-text" title="날짜 수정">${fmtDate(entry.createdAt)}</span>
-          <input type="date" class="date-input" style="display:none;" value="${getLocalDateString(entry.createdAt)}">
-        </div>
-        <div class="detail-entry-actions">
-          <button class="detail-entry-edit" data-id="${entry.id}" aria-label="수정">수정</button>
-          <button class="detail-entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
-        </div>
-      </div>
-      ${pairsHtml}
-      <div class="hide-hint">문장을 누르면 영어가 나타나고, 다시 누르면 가려집니다</div>
-    `;
 
-    card.querySelector('.detail-entry-edit').addEventListener('click', (e) => {
-      e.stopPropagation();
-      editingEntryId = entry.id;
-      renderDetailView();
-    });
-    
     card.querySelector('.detail-entry-del').addEventListener('click', (e) => {
       e.stopPropagation();
       if (!checkPassword()) return;
