@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>영어 노트 데이터 이전</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:680px;margin:40px auto;padding:0 20px;line-height:1.6;color:#1e2c22;background:#eaeadd}
+    main{background:#f4f4ec;border:1px solid #cfcfbc;border-radius:6px;padding:24px}
+    button{background:#1e2c22;color:#eaeadd;border:0;border-radius:4px;padding:12px 18px;font-size:15px;cursor:pointer}
+    button:disabled{opacity:.6;cursor:wait}.status{margin-top:16px;white-space:pre-wrap}.ok{color:#276738}.error{color:#7c3b49}
+  </style>
+</head>
+<body>
+<main>
+  <h1>기존 영어 노트 이전</h1>
+  <p>Supabase 백업에서 <code>d4d3c9c1-556</code> 방의 노트 4개를 Firebase Firestore로 복사합니다.</p>
+  <p>기존 문서 ID와 작성 날짜를 유지하며, 같은 ID가 이미 있으면 덮어씁니다.</p>
+  <button id="migrateBtn">노트 4개 가져오기</button>
+  <div id="status" class="status"></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: 'AIzaSyBM7bugwRjrCe3MMm6FFqEqGEMXC85bbl8',
+  authDomain: 'vivian-project-f73d9.firebaseapp.com',
+  projectId: 'vivian-project-f73d9',
+  storageBucket: 'vivian-project-f73d9.firebasestorage.app',
+  messagingSenderId: '110774190170',
+  appId: '1:110774190170:web:399d59c14440a9ca6e1863'
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const roomId = 'd4d3c9c1-556';
+
+const entries = [
+  {
+    id: 'e_1787555423746_bpjam5',
+    createdAt: '2026-08-24T07:10:23.746Z',
+    sentences: [
+      {en:'This weekend was pretty normal.',ko:'이번 주말은 평범했다.'},
+      {en:'I played tennis from 9 a.m to 2 p.m.',ko:'테니스를 쳤다. 9시부터 2시까지.'},
+      {en:'It was longer than usual, but I really enjoyed it.',ko:'이건 평소보다 긴 시간이었지만 즐거웠다.'},
+      {en:'In the evening, I met a friend and had dinner together.',ko:'저녁에는 친구를 만나 저녁을 먹었다.'},
+      {en:'It was takeout, but it was exactly what I wanted to eat.',ko:'배달 음식이었지만 내가 먹고 싶었던 메뉴였다.'},
+      {en:'We took a walk and talked about this and that.',ko:'산책을 하면서 이런 저런 이야기를 나누었다.'},
+      {en:'While spending that time, I realized something important.',ko:'그 시간들을 보내면서 내가 느꼈던 중요한 게 있다.'},
+      {en:'Sometimes - or maybe too often- I blurt out my thoughts without organizing them first.',ko:'때때로, 혹은 너무 자주, 나는 내가 하고 싶은 말을 정리되지 않은 채 내뱉는 것 같다.'},
+      {en:"Often, I can't think of the right words or expressions, making me feel like I'm not getting my message across properly.",ko:'적절한 단어나 표현이 떠오르지 않을 때도 많고, 그래서 내가 하는 말이잘 전달되지 않는 듯한 느낌도 든다.'},
+      {en:"I don't think it's just a lack of vocabulary.",ko:'그건 단순히 어휘력의 부족 때문은 아닌 듯 하다.'},
+      {en:"It's because I start talking before I've even figured out what I really want to say.",ko:'무엇을 말하고자 하는지, 머릿속에서 제대로 정리되지 않은 상태로 대화를 시작해버렸기 때문이다.'},
+      {en:'I think I need time for quiet reflection.',ko:'사색의 시간이 필요한 것 같다.'},
+      {en:'Reading time is important to me.',ko:'책 읽는 시간은 나에게 중요하다.'},
+      {en:'Books help me recover the sense I lost while spacing out over Reels or Shorts.',ko:'책은 릴스가 숏츠 같은 영상을 보며 멍 때리느라 잃어버린 감각들을 찾게 해준다.'},
+      {en:'Above all, it definitely helps me build my attention span.',ko:'무엇보다 집중력을 키우는 데 도움을 주는 것이 확실하다.'},
+      {en:'It also takes care and effort to read through line by line.',ko:'문장 하나하나를 읽어 내려가는 정성도 필요하다.'},
+      {en:'People say it\'s better to read even one good book thoroughly, but what I need right now is to keep reading every day - whether it\'s 1 book or 100 books.',ko:'좋은 책 한권이라도 제대로 읽어야 한다고 말하지만, 지금 나에게 필요한 것은 한권이든 100권이든 매일 읽어내려가는 것이다.'}
+    ]
+  },
+  {
+    id: 'e_1787647628415_8xvebt',
+    createdAt: '2026-08-18T15:00:00.000Z',
+    sentences: [
+      {en:'I quit my job yesterday and I woke up to my first morning after leaving.',ko:'나는 어제 퇴사를 했다. 그리고 퇴사 후 첫 아침을 맞았다.'},
+      {en:'I woke up early, and I wanted to build a productive routine for myself.',ko:'아침부터 일찍 눈을 떴고, 부지런한 나만의 생활 방식을 찾고자 했다.'},
+      {en:'I was planning to eat breakfast, grab my laptop and head out.',ko:'아침을 챙겨 먹고, 노트북을 챙겨서 밖에 나갈 예정이었다.'},
+      {en:"But while lying in bed scrolling on my phone, I thought, 'Hey, I can enjoy my day off today'. And just like that, the morning slipped away.",ko:"하지만 침대에 잠깐 누워서 핸드폰을 하다가, '오늘은 퇴사를 좀 즐겨도 되지'라는 생각이 들었다. 그렇게 오전을 흘려보냈다."},
+      {en:"I didn't set huge goals after quitting, because that usually burns me out or stops me from even starting.",ko:'퇴사 후 큰 목표를 정하지는 않았다. 그것이 오히려 나를 지치게 하거나 시작도 하지 않게 만들기 때문이다.'},
+      {en:'What I need and want to do was simple.',ko:'내가 해야 하는 혹은 하고 싶은 것은 간단했다.'},
+      {en:"Reading books until I'm sick of it.",ko:'1. 지겹도록 책을 읽자.'},
+      {en:'Study English every single day, even briefly. Consistency is key.',ko:'2. 영어 공부를 매일 하자. 짧게라도. 매일 하는 것이 중요하다.'},
+      {en:'Explore what I truly enjoy.',ko:'3. 좋아하는 것을 찾아보자'},
+      {en:'Cut down on-screen time, especially Social media.',ko:'4. 핸드폰 사용을 줄이자. 특히 SNS를 끊자.'},
+      {en:'Declutter unnecessary stuff bit by bit, and list them on second-hand apps, whenever I have time.',ko:'5. 불필요한 물건들을 조금씩 정리하자. 시간이 될때마다 당근마켓에 올려보자.'},
+      {en:"Still, I feel like I didn't get much done today. I will make it happen tomorrow for sure.",ko:'그럼에도 나는 오늘 제대로 시작한 것이 없는 듯하다. 내일은 꼭 해야지.'}
+    ]
+  },
+  {
+    id: 'e_1788185761252_8qkmvs',
+    createdAt: '2026-08-26T15:00:00.000Z',
+    sentences: [
+      {en:"I am more productive outside the house than inside. Actucally, 'better focused' would be a more accurate way to put it.",ko:'나는 집에 있을 때보다 집 밖에서 더 생산성이 올라간다. 생산성보다는 집중력이 더 맞겠다.'},
+      {en:'So today, I took my laptop and went to a cafe again.',ko:'그래서 오늘도 노트북을 들고 카페를 갔다.'},
+      {en:'Whether it\'s reading, studing, or prepping for a business, my willpower weakens at home.',ko:'책을 읽든, 공부를 하든, 사업을 준비하든. 집에서는 의지가 약해진다.'},
+      {en:'I end up lying on the couch eating snacks while reading, and then falling asleep.',ko:'소파에 누워서 과자를 먹으며 책을 보다가 잠들어 버린다.'},
+      {en:"I think to myself, 'I'll just rest a bit after lunch before starting,' and then spend hours just on my phone.",ko:'점심을 먹고 나서 잠깐 쉬고 시작해야지, 라고 생각하다가 몇 시간을 핸드폰만 하고 있다.'},
+      {en:'At home, I keep procrastinating and getting lazy.',ko:'집에서는 자꾸 미루게 되고, 게을러지는 것 같다.'},
+      {en:'So I usually haed out to a cafe.',ko:'그래서 보통 카페를 간다.'},
+      {en:"Once I'm at a cafe, I'm forced to stay seated.",ko:'일단 카페를 가면, 의자에 앉아 있어야 한다.'},
+      {en:'Even if I get bored after reading for 30 minutes, I have to stay in that chair.',ko:'책을 30분 정도 읽다가 지겨워지더라도 계속 앉아있어야 하는 것이다.'},
+      {en:"It seems I'm someone who is heavily influenced by my surroundings.",ko:'나는 주변 환경의 영향을 많이 받는 사람인 것 같다.'},
+      {en:"Controlling my own life isn't easy.",ko:'스스로 삶을 통제하는 것이 쉽지 않다.'},
+      {en:"I shouldn't view this too negatively, though.",ko:'슬프게만 생각하지 말자.'},
+      {en:'I already know the answer: I just avoid the environment that brings out the worst in me.',ko:'방법은 알고있다. 나를 타락시키는 주변 환경을 피하면 된다.'},
+      {en:'When I\'m dabating whether to do someting or not, I just need to decide to do it.',ko:'할까 말까 생각이 들때는 하는 것으로 결정하면 된다.'},
+      {en:"I shouldn't feel stingy about small costs like gas or coffee just to get to the cafe.",ko:'카페를 가기 위한 기름 값이나 커피 값이나 하는 것들을 아까워하지 않으면 된다.'},
+      {en:"That's how I'll improve, bit by bit.",ko:'이렇게 조금씩 나아지면 된다.'}
+    ]
+  },
+  {
+    id: 'e_1788183690254_csiq6c',
+    createdAt: '2026-08-30T15:00:00.000Z',
+    sentences: [
+      {en:'Will I be able to work at a company again?',ko:'회사를 다닐 수 있을까?'},
+      {en:"It's not matter of whether I can adopt well, but rather a question of whether re-employment is even possible for me.",ko:'내가 잘 다닐 수 있겠느냐에 대한 것이 아니라, 재취업이 가능할까라는 의문이다.'},
+      {en:"I'm submitting applications wherever I can and taking any interview that comes my way.",ko:'될 수 있는 대로 서류를 내보고, 잡히는 대로 면접을 보고 있다.'},
+      {en:"I'm actively job hunting across the board, from major corporations to startups.",ko:'대기업부터 스타트업까지 가리지 않고 취업 활동을 하고 있다.'},
+      {en:'With around 9 years of work experience exclusively at well-known IT companies, I think I subconsciously assumed it would be easy to land a job at a small company.',ko:'9년 정도의 업무 경력이 있고, 유명한 IT 기업들만 다녔기 때문인지, 작은 기업에 취업하기는 쉬울거라고 생각했던 것 같다.'},
+      {en:"However, my resume pass rate for startups hasn't been 100%, and I've failed plenty of interviews along the way.",ko:'하지만 스타트업에 제출한 서류 합격률이 100%도 아니었고, 면접에서 탈락하는 경우도 많다.'},
+      {en:'It hurts, and my confidence is taking a hit. Are all these outcomes really my fault?',ko:'속상하다. 자신감이 떨어진다. 이 결과들은 모두 나의 문제인걸까?'},
+      {en:'Or am I just not desperate enough?',ko:'아니면 간절함이 부족한걸까?'},
+      {en:"On top of job hunting, I also have the personal task of checking off the things I've always wanted to do, one by one.",ko:'취업도 준비하면서 하고 싶었던 것들을 하나씩 해나가야하는 스스로의 숙제도 있다.'},
+      {en:"After all, If re-employment doesn't work out as planned, I'll have to go all-in my own business.",ko:'결국 원하는 대로 취업이 되지 않으면 사업에 올인해야 하니까.'},
+      {en:"I'm interested in running a recycling business with local government grants, and I also dream of launching my own brand to sell products.",ko:'지차체 지원을 받아서 리사이클링 사업을 해보고 싶기도 하고, 나만의 브랜드를 만들어서 제품을 팔아보고 싶기도 하다.'},
+      {en:'I quit recklessly simply wanting to do work I enjoy, but I have to admit, it feels overwhelming.',ko:'재미있게 일하고 싶다는 생각으로 무작정 나왔는데 막막하긴 하다.'},
+      {en:'Between re-employment and staring my own business, which path will end up taking?',ko:'재취업과 나만의 사업 중에서, 무엇을 하게 될까.'}
+    ]
+  }
+];
+
+const status = document.getElementById('status');
+const button = document.getElementById('migrateBtn');
+button.addEventListener('click', async () => {
+  button.disabled = true;
+  status.className = 'status';
+  status.textContent = '이전 중...';
+  try {
+    const batch = db.batch();
+    entries.forEach(entry => {
+      const ref = db.collection('rooms').doc(roomId).collection('entries').doc(entry.id);
+      batch.set(ref, {
+        sentences: entry.sentences,
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date(entry.createdAt))
+      });
+    });
+    await batch.commit();
+    status.className = 'status ok';
+    status.textContent = `완료되었습니다. ${entries.length}개 노트를 이전했습니다.\n\n확인 주소:\nhttps://english-notebook-phi.vercel.app/?room=${roomId}`;
+  } catch (error) {
+    console.error(error);
+    status.className = 'status error';
+    status.textContent = '이전하지 못했습니다.\n' + (error.message || error);
+    button.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
