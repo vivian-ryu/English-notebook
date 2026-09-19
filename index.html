@@ -1,23 +1,1059 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>한 줄, 영어로</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--paper:#EAEADF;--card:#F4F4EC;--ink:#1E2C22;--soft:#4B5A4E;--faint:#8A9088;--wine:#7C3B49;--deep:#5A2A34;--tint:#F1E0E2;--border:#CFCFBC}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif}.wrap{max-width:760px;margin:auto;padding:48px 24px 80px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:36px}.brand{font:500 26px Fraunces,serif}.brand span{color:var(--wine)}.streak,.label,.date,.hint{font:11px 'IBM Plex Mono',monospace;color:var(--faint)}button{font-family:inherit;cursor:pointer;border:0;background:none}.primary{background:var(--ink);color:var(--paper);padding:10px 20px;border-radius:3px;font-weight:500}.primary:hover{background:var(--deep)}.ghost{color:var(--faint);padding:10px}.back{display:none;border:1px solid var(--border);padding:8px 12px;border-radius:3px;color:var(--soft)}.back.show{display:block}.onboarding{text-align:center;padding:60px 20px;border:1px dashed var(--border);border-radius:4px;color:var(--soft)}.onboarding p{line-height:1.7}.share{display:none;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);padding:12px 14px;margin-bottom:24px}.share input{flex:1;min-width:0;padding:8px;border:1px solid var(--border);background:var(--paper);font:12px 'IBM Plex Mono',monospace}.compose{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px 24px 20px;margin-bottom:44px}.compose.hidden{display:none}textarea{font-family:inherit}.input{width:100%;min-height:110px;resize:vertical;border:0;outline:0;background:transparent;font-size:17px;line-height:1.9;color:var(--ink);padding:0;margin-top:10px;background-image:repeating-linear-gradient(transparent,transparent 37px,#D8D8C8 38px)}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.error{display:none;color:var(--wine);font-size:12px;margin-top:6px}.preview{display:none;border-top:1px dashed var(--border);margin-top:18px;padding-top:16px}.pair{margin:0 0 16px}.ko{color:var(--soft);font-size:14.5px;margin-bottom:5px}.en{font:17px/1.6 Fraunces,serif;color:var(--deep)}.entries{display:flex;flex-direction:column;gap:12px}.empty{padding:30px 4px;text-align:center;border:1px dashed var(--border);color:var(--faint);font-size:14px}.group{border-left:3px solid var(--border)}.group-head{display:flex;gap:8px;padding:12px 16px;cursor:pointer;color:var(--soft);font:12px 'IBM Plex Mono',monospace}.group-head strong{flex:1}.group-body{display:flex;flex-direction:column;gap:8px;padding:0 16px 8px}.group-body.closed{display:none}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:10px 14px;cursor:pointer}.item:hover{border-color:var(--wine)}.item-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;flex:1}.delete{color:var(--faint);font-size:12px}.delete:hover{color:var(--wine)}.detail{display:none}.detail.show{display:block}.detail-title{border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:24px;font:12px 'IBM Plex Mono',monospace;color:var(--soft)}.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:16px}.card-head{display:flex;justify-content:space-between;margin-bottom:12px}.mask{height:36px;background:var(--ink);border-radius:3px;cursor:pointer;margin-top:8px}.mask.shown{display:none}.enblock{display:none;background:var(--tint);padding:10px 12px;border-radius:3px;margin-top:8px;cursor:pointer}.enblock.show{display:block}.edit{width:100%;min-height:44px;padding:8px;border:1px solid var(--border);background:var(--paper);margin:4px 0;font-size:14px}.edit-actions{display:flex;justify-content:flex-end;gap:8px}.status{font-size:12px;color:var(--wine);margin:8px 0;display:none}
-</style></head><body><main class="wrap"><header><button id="back" class="back">← 돌아가기</button><div class="brand">한 줄<span>,</span> 영어로</div><div class="streak">기록 <b id="count">0</b>개</div></header><div id="share" class="share"><span class="label">공유 링크</span><input id="url" readonly><button id="copy" class="ghost">복사</button></div><section id="onboarding" class="onboarding"><p>공유 노트를 새로 만들면 링크가 생겨요.<br>그 링크를 받은 사람은 누구나 같은 노트를 보고 함께 쓸 수 있어요.</p><button id="create" class="primary">공유 노트 만들기</button><p class="label">이 링크를 아는 사람은 누구나 보고 지울 수 있으니 민감한 내용은 적지 마세요.</p></section><section id="app" style="display:none"><div id="compose" class="compose"><div class="label">한글 문장 다음 줄에 영어 문장을 써주세요 (한글, 영어 번갈아가며)</div><textarea id="input" class="input" placeholder="나는 매일 영어 공부를 한다.&#10;I study English every single day."></textarea><div id="error" class="error"></div><div class="actions"><button id="check" class="primary">확인하기</button></div><div id="preview" class="preview"><div class="label">이렇게 저장돼요</div><div id="previewList"></div><div class="actions"><button id="discard" class="ghost">취소</button><button id="save" class="primary">노트에 저장</button></div></div></div><div class="label" style="margin:0 0 14px 2px">지난 기록 · 이 링크를 여는 모든 사람과 공유됩니다</div><div id="entries" class="entries"><div id="empty" class="empty">아직 저장된 노트가 없어요.</div></div><div id="detail" class="detail"><div id="detailTitle" class="detail-title"></div><div id="detailEntries"></div></div></section></main>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script>
-const firebaseConfig={apiKey:'AIzaSyBM7bugwRjrCe3MMm6FFqEqGEMXC85bbl8',authDomain:'vivian-project-f73d9.firebaseapp.com',projectId:'vivian-project-f73d9',storageBucket:'vivian-project-f73d9.firebasestorage.app',messagingSenderId:'110774190170',appId:'1:110774190170:web:399d59c14440a9ca6e1863'};firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
-const $=id=>document.getElementById(id),back=$('back'),onboarding=$('onboarding'),app=$('app'),share=$('share'),url=$('url'),input=$('input'),error=$('error'),preview=$('preview'),previewList=$('previewList'),entriesBox=$('entries'),detail=$('detail'),detailTitle=$('detailTitle'),detailEntries=$('detailEntries');let roomId=null,entries=[],pending=[];
-const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML},date=s=>{const d=new Date(s);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`},collection=()=>db.collection('rooms').doc(roomId).collection('entries');
-function show(){onboarding.style.display='none';share.style.display='flex';app.style.display='block';url.value=location.href}function id(){return crypto.randomUUID?crypto.randomUUID().slice(0,12):'r'+Date.now().toString(36)}
-async function load(){try{const snap=await collection().orderBy('createdAt','desc').get();entries=snap.docs.map(d=>{const x=d.data();return{id:d.id,sentences:x.sentences||[],createdAt:x.createdAt?.toDate?x.createdAt.toDate().toISOString():x.createdAt}});render()}catch(e){console.error(e);entries=[];render();error.textContent='Firebase에서 노트를 불러오지 못했어요. Firestore 규칙을 확인해주세요.';error.style.display='block'}}
-async function put(e){await collection().doc(e.id).set({sentences:e.sentences,createdAt:firebase.firestore.Timestamp.fromDate(new Date(e.createdAt))})}async function remove(i){await collection().doc(i).delete()}async function update(i,s){await collection().doc(i).update({sentences:s})}
-function render(){ $('count').textContent=entries.length;entriesBox.innerHTML='';if(!entries.length){entriesBox.appendChild($('empty'));return}const groups={};entries.forEach(e=>(groups[date(e.createdAt)]??=[]).push(e));Object.keys(groups).sort().reverse().forEach(day=>{const g=document.createElement('div');g.className='group';const h=document.createElement('div');h.className='group-head';h.innerHTML=`<span>▾</span><strong>${day}</strong><span>${groups[day].length}</span>`;const b=document.createElement('div');b.className='group-body';h.onclick=()=>b.classList.toggle('closed');groups[day].forEach(e=>{const i=document.createElement('div');i.className='item';i.innerHTML=`<span class="item-text">${esc(e.sentences[0]?.ko||'')}</span><button class="delete">삭제</button>`;i.querySelector('.item-text').onclick=()=>detailView(day);i.querySelector('.delete').onclick=async x=>{x.stopPropagation();if(prompt('삭제하시려면 비밀번호를 입력하세요')==='5604'){await remove(e.id);entries=entries.filter(v=>v.id!==e.id);render()}};b.appendChild(i)});g.append(h,b);entriesBox.appendChild(g)})}
-function detailView(day){entriesBox.style.display='none';$('compose').style.display='none';detail.className='detail show';back.classList.add('show');detailTitle.textContent=day;detailEntries.innerHTML='';entries.filter(e=>date(e.createdAt)===day).forEach(e=>{const c=document.createElement('div');c.className='card';c.innerHTML=`<div class="card-head"><span class="date">${date(e.createdAt)}</span><button class="delete">삭제</button></div>`;e.sentences.forEach((s,n)=>{const p=document.createElement('div');p.className='pair';p.innerHTML=`<div class="ko">${esc(s.ko)}</div><div class="mask"></div><div class="enblock">${esc(s.en)}</div>`;p.querySelector('.mask').onclick=()=>{p.querySelector('.mask').classList.add('shown');p.querySelector('.enblock').classList.add('show')};p.querySelector('.enblock').onclick=()=>{p.querySelector('.enblock').classList.remove('show');p.querySelector('.mask').classList.remove('shown')};c.appendChild(p)});c.querySelector('.delete').onclick=async()=>{if(prompt('삭제하시려면 비밀번호를 입력하세요')==='5604'){await remove(e.id);entries=entries.filter(v=>v.id!==e.id);list()}};detailEntries.appendChild(c)})}
-function list(){detail.className='detail';entriesBox.style.display='flex';$('compose').style.display='block';back.classList.remove('show');render()}
-$('create').onclick=()=>{roomId=id();localStorage.setItem('lastRoomId',roomId);const u=new URL(location.href);u.searchParams.set('room',roomId);history.replaceState({},'',u);show();render()};back.onclick=list;
-$('check').onclick=()=>{const lines=input.value.split('\n').map(x=>x.trim()).filter(Boolean);if(!lines.length||lines.length%2){error.textContent='한글과 영어 문장을 번갈아 입력해주세요.';error.style.display='block';return}error.style.display='none';pending=[];for(let i=0;i<lines.length;i+=2)pending.push({ko:lines[i],en:lines[i+1].replace(/^["“‘']|["”’']$/g,'')});previewList.innerHTML=pending.map(p=>`<div class="pair"><div class="ko">${esc(p.ko)}</div><div class="en">${esc(p.en)}</div></div>`).join('');preview.style.display='block'};$('discard').onclick=()=>{pending=[];preview.style.display='none'};$('save').onclick=async()=>{if(!pending.length)return;const e={id:'e_'+Date.now(),sentences:pending,createdAt:new Date().toISOString()};$('save').disabled=true;try{await put(e);entries.push(e);input.value='';pending=[];preview.style.display='none';render()}catch(x){console.error(x);error.textContent='저장하지 못했어요. Firebase 설정과 Firestore 규칙을 확인해주세요.';error.style.display='block'}finally{$('save').disabled=false}};$('copy').onclick=()=>navigator.clipboard?.writeText(url.value);
-(function init(){const q=new URLSearchParams(location.search),r=q.get('room')||localStorage.getItem('lastRoomId');if(r){roomId=r;show();load()}})();
-</script></body></html>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한 줄, 영어로</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #EAEADF;
+      --paper-line: #D8D8C8;
+      --card: #F4F4EC;
+      --ink: #1E2C22;
+      --ink-soft: #4B5A4E;
+      --ink-faint: #8A9088;
+      --wine: #7C3B49;
+      --wine-deep: #5A2A34;
+      --wine-tint: #F1E0E2;
+      --border: #CFCFBC;
+      --correction: #E8F5E9;
+      --correction-border: #A5D6A7;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Noto Sans KR', -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    .brand {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+    .brand .dot { color: var(--wine); }
+    .streak {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-faint);
+      text-align: right;
+    }
+    .streak b { color: var(--ink-soft); font-weight: 500; }
+    .back-btn {
+      display: none;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 8px 12px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 13px;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .back-btn.show { display: inline-block; }
+
+    .share-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px 14px;
+      margin-bottom: 24px;
+    }
+    .share-bar .share-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .share-bar input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      border-radius: 3px;
+      padding: 8px 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .onboarding {
+      text-align: center;
+      padding: 60px 20px;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.08);
+    }
+    .onboarding p {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto 22px;
+    }
+    .warn {
+      font-size: 12px;
+      color: var(--wine);
+      margin-top: 14px;
+      display: none;
+    }
+
+    .compose {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 22px 24px 20px;
+      margin-bottom: 44px;
+      position: relative;
+    }
+    .compose.hidden { display: none; }
+    .compose .label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    #koInput {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 17px;
+      line-height: 1.9;
+      color: var(--ink);
+      padding: 0;
+      background-image: repeating-linear-gradient(transparent, transparent 37px, var(--paper-line) 38px);
+    }
+    #koInput::placeholder { color: var(--ink-faint); }
+
+    .compose-foot {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 3px;
+      transition: background .15s ease, transform .1s ease;
+    }
+    .btn-primary:hover { background: var(--wine-deep); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { background: var(--ink-faint); cursor: default; }
+    .btn-ghost {
+      font-size: 13px;
+      color: var(--ink-faint);
+      padding: 10px 10px;
+    }
+    .btn-ghost:hover { color: var(--ink-soft); }
+
+    .err-msg {
+      font-size: 12px;
+      color: var(--wine);
+      margin-top: 6px;
+      display: none;
+    }
+
+    .preview {
+      display: none;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    .preview .label { color: var(--wine); }
+    .preview-pair { margin-bottom: 18px; }
+    .preview-pair:last-child { margin-bottom: 0; }
+    .preview-ko {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+    }
+    .preview-text {
+      font-family: 'Fraunces', serif;
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--wine-deep);
+      margin-bottom: 8px;
+    }
+    .preview-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .list-head {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      margin: 0 0 14px 2px;
+    }
+    .entries { display: flex; flex-direction: column; gap: 12px; }
+    .empty {
+      font-size: 14px;
+      color: var(--ink-faint);
+      padding: 30px 4px;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .date-group {
+      border-left: 3px solid var(--border);
+      padding-left: 0;
+    }
+    .date-group-header {
+      cursor: pointer;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      transition: background .15s ease;
+    }
+    .date-group-header:hover { background: rgba(30,44,34,0.03); }
+    .date-group-toggle {
+      font-size: 12px;
+      color: var(--ink-soft);
+      transition: transform .2s ease;
+    }
+    .date-group-toggle.collapsed { transform: rotate(-90deg); }
+    .date-group-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      letter-spacing: 0.05em;
+      flex: 1;
+    }
+    .date-group-count {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-faint);
+    }
+    .date-group-entries {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 16px 8px 16px;
+      max-height: 1000px;
+      overflow: hidden;
+      transition: max-height .3s ease, opacity .3s ease, padding .3s ease;
+      opacity: 1;
+    }
+    .date-group-entries.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding: 0 16px;
+    }
+
+    .entry-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .entry-item:hover {
+      background: rgba(30,44,34,0.02);
+      border-color: var(--wine);
+    }
+    .entry-item-content { flex: 1; min-width: 0; }
+    .entry-item-preview {
+      font-size: 13px;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .entry-item-del {
+      font-size: 12px;
+      color: var(--ink-faint);
+      flex-shrink: 0;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .entry-item-del:hover { color: var(--wine); }
+
+    .detail-view { display: none; }
+    .detail-view.show { display: block; }
+    .detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      letter-spacing: 0.05em;
+    }
+    .detail-entries {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .detail-entry {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .detail-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .detail-entry-date {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      color: var(--ink-faint);
+    }
+    .detail-entry-del {
+      font-size: 12px;
+      color: var(--ink-faint);
+      cursor: pointer;
+      padding: 4px;
+    }
+    .detail-entry-del:hover { color: var(--wine); }
+
+    .sentence-pair {
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .sentence-pair:last-child { margin-bottom: 0; }
+    .entry-ko {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--ink);
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+      border-bottom: 1px dashed transparent;
+      transition: border-color .15s ease, color .15s ease;
+    }
+    .entry-ko:hover { border-bottom-color: var(--ink-faint); }
+    .mask {
+      border-radius: 3px;
+      cursor: pointer;
+      background: var(--ink);
+      height: 36px;
+      transition: background .15s ease;
+      margin-bottom: 8px;
+    }
+    .mask:hover { background: var(--wine-deep); }
+    .en-block {
+      display: none;
+      background: var(--wine-tint);
+      border-radius: 3px;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    .en-block.shown { display: block; }
+    .mask.shown { display: none; }
+    .entry-en {
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--wine-deep);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .listen-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(124,59,73,0.08);
+      border: 1px solid rgba(124,59,73,0.2);
+      color: var(--wine-deep);
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-top: 4px;
+    }
+    .listen-btn:hover { background: rgba(124,59,73,0.12); }
+    .listen-btn.playing {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .hide-hint {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-faint);
+      margin-top: 8px;
+    }
+
+    .edit-ko, .edit-en {
+      width: 100%;
+      resize: vertical;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      border-radius: 3px;
+      outline: none;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--ink);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      min-height: 44px;
+    }
+    .edit-en {
+      font-family: 'Fraunces', serif;
+      min-height: 44px;
+    }
+    .edit-field-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+    }
+    .edit-err {
+      font-size: 12px;
+      color: var(--wine);
+      margin-bottom: 8px;
+      display: none;
+    }
+    .edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <button class="back-btn" id="backBtn">← 돌아가기</button>
+      <div class="brand">한 줄<span class="dot">,</span> 영어로</div>
+      <div class="streak">기록 <b id="entryCount">0</b>개</div>
+    </header>
+
+    <div class="share-bar" id="shareBar">
+      <span class="share-label">공유 링크</span>
+      <input type="text" id="shareUrl" readonly />
+      <button class="btn-ghost" id="copyBtn">복사</button>
+    </div>
+
+    <div class="onboarding" id="onboarding">
+      <p>공유 노트를 새로 만들면 링크가 생겨요.<br>그 링크를 받은 사람은 누구나 같은 노트를 보고, 함께 쓸 수 있어요.</p>
+      <button class="btn-primary" id="createRoomBtn">공유 노트 만들기</button>
+      <div class="warn" id="onboardErr"></div>
+      <p class="warn">이 링크를 아는 사람은 누구나 보고 지울 수 있으니, 민감한 내용은 적지 마세요.</p>
+    </div>
+
+    <div id="appMain" style="display:none;">
+      <section class="compose" id="compose">
+        <div class="label">한글 문장 다음 줄에 영어 문장을 써주세요 (한글, 영어 번갈아가며)</div>
+        <textarea id="koInput" placeholder="나는 매일 영어 공부를 한다.
+I study English every single day.
+매일 아침 30분씩 공부하는 것이 목표다.
+My goal is to study for 30 minutes every morning."></textarea>
+        <div class="err-msg" id="errMsg">한글 문장 다음 줄에 영어 문장을 써주세요. 줄 수가 짝이 맞아야 해요.</div>
+        <div class="compose-foot">
+          <button class="btn-primary" id="translateBtn">확인하기</button>
+        </div>
+
+        <div class="preview" id="preview">
+          <div class="label">이렇게 저장돼요</div>
+          <div id="previewList"></div>
+          <div class="preview-actions">
+            <button class="btn-ghost" id="discardBtn">취소</button>
+            <button class="btn-primary" id="saveBtn">노트에 저장</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="list-head">지난 기록 <span style="text-transform:none; letter-spacing:0; color:var(--ink-faint);">· 이 링크를 여는 모든 사람과 공유됩니다</span></div>
+      <div class="entries" id="entries">
+        <div class="empty" id="emptyState">아직 저장된 노트가 없어요. 위에서 오늘의 문장을 적어보세요.</div>
+      </div>
+
+      <div class="detail-view" id="detailView">
+        <div class="detail-header">
+          <div class="detail-title" id="detailTitle"></div>
+        </div>
+        <div class="detail-entries" id="detailEntries"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: 'AIzaSyBM7bugwRjrCe3MMm6FFqEqGEMXC85bbl8',
+      authDomain: 'vivian-project-f73d9.firebaseapp.com',
+      projectId: 'vivian-project-f73d9',
+      storageBucket: 'vivian-project-f73d9.firebasestorage.app',
+      messagingSenderId: '110774190170',
+      appId: '1:110774190170:web:399d59c14440a9ca6e1863'
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const backBtn = document.getElementById('backBtn');
+    const koInput = document.getElementById('koInput');
+    const translateBtn = document.getElementById('translateBtn');
+    const errMsg = document.getElementById('errMsg');
+    const preview = document.getElementById('preview');
+    const previewList = document.getElementById('previewList');
+    const discardBtn = document.getElementById('discardBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const entriesBox = document.getElementById('entries');
+    const emptyState = document.getElementById('emptyState');
+    const entryCount = document.getElementById('entryCount');
+    const onboarding = document.getElementById('onboarding');
+    const onboardErr = document.getElementById('onboardErr');
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    const appMain = document.getElementById('appMain');
+    const shareBar = document.getElementById('shareBar');
+    const shareUrl = document.getElementById('shareUrl');
+    const copyBtn = document.getElementById('copyBtn');
+    const compose = document.getElementById('compose');
+    const detailView = document.getElementById('detailView');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailEntries = document.getElementById('detailEntries');
+
+    let pendingSentences = [];
+    let entries = [];
+    let roomId = null;
+    let selectedDate = null;
+    let editingSentenceKey = null;
+
+    function fmtDate(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function getLocalDateString(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function showApp() {
+      onboarding.style.display = 'none';
+      shareBar.style.display = 'flex';
+      appMain.style.display = 'block';
+      shareUrl.value = window.location.href;
+    }
+
+    function genRoomId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID().slice(0, 12);
+      return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    function createRoom() {
+      onboardErr.style.display = 'none';
+      const id = genRoomId();
+      const url = new URL(window.location.href);
+      url.searchParams.set('room', id);
+      window.history.replaceState({}, '', url.toString());
+      roomId = id;
+      localStorage.setItem('lastRoomId', id);
+      entries = [];
+      showApp();
+      renderListView();
+    }
+
+    function collection() {
+      return db.collection('rooms').doc(roomId).collection('entries');
+    }
+
+    async function loadEntries() {
+      try {
+        const snap = await collection().orderBy('createdAt', 'desc').get();
+        entries = snap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            sentences: Array.isArray(data.sentences) ? data.sentences : [],
+            createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : new Date(data.createdAt).toISOString()) : new Date().toISOString()
+          };
+        });
+      } catch (e) {
+        console.error(e);
+        entries = [];
+      }
+      renderListView();
+    }
+
+    async function insertEntry(entry) {
+      await collection().doc(entry.id).set({
+        sentences: entry.sentences,
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date(entry.createdAt))
+      });
+    }
+
+    async function deleteEntry(id) {
+      await collection().doc(id).delete();
+    }
+
+    async function updateEntryDate(id, newIso) {
+      await collection().doc(id).update({ createdAt: firebase.firestore.Timestamp.fromDate(new Date(newIso)) });
+    }
+
+    async function updateEntrySentences(id, sentences) {
+      await collection().doc(id).update({ sentences });
+    }
+
+    function groupByDate(items) {
+      const groups = {};
+      items.forEach(entry => {
+        const key = fmtDate(entry.createdAt);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(entry);
+      });
+      return groups;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function stripQuotes(text) {
+      return text.replace(/^['\"]+|['\"]+$/g, '').trim();
+    }
+
+    function parseInput() {
+      const lines = koInput.value.split(/\n/).map(line => line.trim()).filter(Boolean);
+      if (!lines.length || lines.length % 2 !== 0) return null;
+
+      const pairs = [];
+      for (let i = 0; i < lines.length; i += 2) {
+        const ko = lines[i];
+        const en = stripQuotes(lines[i + 1]);
+        if (!ko || !en) return null;
+        pairs.push({ ko, en });
+      }
+      return pairs;
+    }
+
+    function renderPreview() {
+      const pairs = parseInput();
+      if (!pairs) {
+        preview.style.display = 'none';
+        errMsg.style.display = 'block';
+        return;
+      }
+
+      errMsg.style.display = 'none';
+      previewList.innerHTML = pairs.map(pair => `
+        <div class="preview-pair">
+          <div class="preview-ko">${escapeHtml(pair.ko)}</div>
+          <div class="preview-text">${escapeHtml(pair.en)}</div>
+        </div>
+      `).join('');
+      preview.style.display = 'block';
+      pendingSentences = pairs;
+    }
+
+    function goToDetailView(date) {
+      selectedDate = date;
+      backBtn.classList.add('show');
+      compose.classList.add('hidden');
+      entriesBox.style.display = 'none';
+      detailView.classList.add('show');
+      renderDetailView();
+    }
+
+    function goToListView() {
+      editingSentenceKey = null;
+      backBtn.classList.remove('show');
+      compose.classList.remove('hidden');
+      entriesBox.style.display = 'flex';
+      detailView.classList.remove('show');
+      renderListView();
+    }
+
+    function speakEnglish(text) {
+      if (!('speechSynthesis' in window)) {
+        alert('이 브라우저는 음성 재생을 지원하지 않습니다. Chrome 또는 Edge를 추천해요.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.96;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function renderDetailView() {
+      const sorted = [...entries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const grouped = groupByDate(sorted);
+      const dayEntries = grouped[selectedDate] || [];
+
+      detailTitle.textContent = selectedDate;
+      detailEntries.innerHTML = '';
+
+      dayEntries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'detail-entry';
+
+        const pairsHtml = entry.sentences.map((s, idx) => {
+          const key = `${entry.id}_${idx}`;
+          if (editingSentenceKey === key) {
+            return `
+              <div class="sentence-pair" data-editing-key="${key}">
+                <div class="edit-field-label">한글</div>
+                <textarea class="edit-ko">${escapeHtml(s.ko)}</textarea>
+                <div class="edit-field-label">영어</div>
+                <textarea class="edit-en">${escapeHtml(s.en)}</textarea>
+                <div class="edit-err"></div>
+                <div class="edit-actions">
+                  <button class="btn-ghost sentence-edit-cancel">취소</button>
+                  <button class="btn-primary sentence-edit-save">저장</button>
+                </div>
+              </div>
+            `;
+          }
+          return `
+            <div class="sentence-pair">
+              <div class="entry-ko" data-key="${key}" title="클릭해서 이 문장만 수정">${escapeHtml(s.ko)}</div>
+              <div class="mask" data-key="${key}"></div>
+              <div class="en-block" data-key="${key}">
+                <div class="entry-en">${escapeHtml(s.en)}</div>
+                <button class="listen-btn" data-speak="${escapeHtml(s.en)}">🔊 듣기</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        card.innerHTML = `
+          <div class="detail-entry-header">
+            <div class="detail-entry-date" data-id="${entry.id}">${fmtDate(entry.createdAt)}</div>
+            <div class="detail-entry-actions">
+              <button class="detail-entry-del" data-id="${entry.id}" aria-label="삭제">삭제</button>
+            </div>
+          </div>
+          ${pairsHtml}
+          <div class="hide-hint">문장을 누르면 영어가 나타나고, 한글 문장을 누르면 그 문장만 수정할 수 있어요</div>
+        `;
+
+        card.querySelectorAll('.entry-ko').forEach(koEl => {
+          koEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            editingSentenceKey = koEl.dataset.key;
+            renderDetailView();
+          });
+        });
+
+        const editingBlock = card.querySelector('.sentence-pair[data-editing-key]');
+        if (editingBlock) {
+          const key = editingBlock.dataset.editingKey;
+          const idx = Number(key.split('_').pop());
+          const koTextarea = editingBlock.querySelector('.edit-ko');
+          const enTextarea = editingBlock.querySelector('.edit-en');
+          const editErr = editingBlock.querySelector('.edit-err');
+
+          editingBlock.querySelector('.sentence-edit-cancel').addEventListener('click', (e) => {
+            e.stopPropagation();
+            editingSentenceKey = null;
+            renderDetailView();
+          });
+
+          editingBlock.querySelector('.sentence-edit-save').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const newKo = koTextarea.value.trim();
+            const newEn = stripQuotes(enTextarea.value.trim());
+            if (!newKo || !newEn) {
+              editErr.textContent = '한글과 영어 문장을 모두 입력해주세요.';
+              editErr.style.display = 'block';
+              return;
+            }
+
+            const btn = e.currentTarget;
+            btn.disabled = true;
+            btn.textContent = '저장 중...';
+            const updatedSentences = entry.sentences.map((s, i) => i === idx ? { ko: newKo, en: newEn } : s);
+            try {
+              await updateEntrySentences(entry.id, updatedSentences);
+              entry.sentences = updatedSentences;
+              editingSentenceKey = null;
+              renderDetailView();
+            } catch (err) {
+              console.error(err);
+              editErr.textContent = '저장하지 못했어요. 잠시 후 다시 시도해주세요.';
+              editErr.style.display = 'block';
+              btn.disabled = false;
+              btn.textContent = '저장';
+            }
+          });
+        }
+
+        card.querySelector('.detail-entry-del').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const pwd = prompt('삭제하시려면 비밀번호를 입력하세요');
+          if (pwd !== '5604') {
+            if (pwd !== null) alert('비밀번호가 일치하지 않습니다.');
+            return;
+          }
+
+          try {
+            await deleteEntry(entry.id);
+            entries = entries.filter(item => item.id !== entry.id);
+            const grouped = groupByDate(entries);
+            if (!grouped[selectedDate] || grouped[selectedDate].length === 0) {
+              goToListView();
+            } else {
+              renderDetailView();
+            }
+          } catch (err) {
+            console.error(err);
+            alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
+          }
+        });
+
+        detailEntries.appendChild(card);
+      });
+
+      detailEntries.querySelectorAll('.listen-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const text = btn.dataset.speak || '';
+          if (!text) return;
+          btn.classList.add('playing');
+          btn.textContent = '🔊 재생 중';
+          speakEnglish(text);
+          setTimeout(() => {
+            btn.classList.remove('playing');
+            btn.textContent = '🔊 듣기';
+          }, 1500);
+        });
+      });
+
+      detailEntries.querySelectorAll('.mask').forEach(mask => {
+        mask.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const key = mask.dataset.key;
+          mask.classList.add('shown');
+          const block = detailEntries.querySelector(`.en-block[data-key="${key}"]`);
+          if (block) block.classList.add('shown');
+        });
+      });
+
+      detailEntries.querySelectorAll('.en-block').forEach(block => {
+        block.addEventListener('click', (e) => {
+          e.stopPropagation();
+          block.classList.remove('shown');
+          const key = block.dataset.key;
+          const maskEl = detailEntries.querySelector(`.mask[data-key="${key}"]`);
+          if (maskEl) maskEl.classList.remove('shown');
+        });
+      });
+    }
+
+    function renderListView() {
+      entryCount.textContent = entries.length;
+      entriesBox.innerHTML = '';
+
+      if (entries.length === 0) {
+        entriesBox.appendChild(emptyState);
+        return;
+      }
+
+      const sorted = [...entries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const grouped = groupByDate(sorted);
+      const dates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+
+      dates.forEach(dateKey => {
+        const group = document.createElement('div');
+        group.className = 'date-group';
+
+        const header = document.createElement('div');
+        header.className = 'date-group-header';
+        header.innerHTML = `
+          <div class="date-group-toggle">▾</div>
+          <div class="date-group-title">${dateKey}</div>
+          <div class="date-group-count">${grouped[dateKey].length}개</div>
+        `;
+
+        const entriesWrap = document.createElement('div');
+        entriesWrap.className = 'date-group-entries';
+
+        grouped[dateKey].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(entry => {
+          const item = document.createElement('div');
+          item.className = 'entry-item';
+          const previewText = entry.sentences.map(s => s.ko).slice(0, 2).join(' · ');
+          item.innerHTML = `
+            <div class="entry-item-content">
+              <div class="entry-item-preview">${escapeHtml(previewText)}</div>
+            </div>
+            <div class="entry-item-del" data-id="${entry.id}">삭제</div>
+          `;
+
+          item.addEventListener('click', (e) => {
+            if (e.target.closest('.entry-item-del')) return;
+            goToDetailView(dateKey);
+          });
+
+          item.querySelector('.entry-item-del').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const pwd = prompt('삭제하시려면 비밀번호를 입력하세요');
+            if (pwd !== '5604') {
+              if (pwd !== null) alert('비밀번호가 일치하지 않습니다.');
+              return;
+            }
+            try {
+              await deleteEntry(entry.id);
+              entries = entries.filter(itemEntry => itemEntry.id !== entry.id);
+              renderListView();
+            } catch (err) {
+              console.error(err);
+              alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
+            }
+          });
+
+          entriesWrap.appendChild(item);
+        });
+
+        header.addEventListener('click', () => {
+          const collapsed = entriesWrap.classList.toggle('collapsed');
+          const toggle = header.querySelector('.date-group-toggle');
+          toggle.classList.toggle('collapsed', collapsed);
+        });
+
+        group.appendChild(header);
+        group.appendChild(entriesWrap);
+        entriesBox.appendChild(group);
+      });
+    }
+
+    async function saveEntry() {
+      if (!pendingSentences.length) return;
+      const entry = {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        sentences: pendingSentences,
+        createdAt: new Date().toISOString()
+      };
+      await insertEntry(entry);
+      entries.unshift(entry);
+      koInput.value = '';
+      preview.style.display = 'none';
+      pendingSentences = [];
+      renderListView();
+    }
+
+    translateBtn.addEventListener('click', () => {
+      renderPreview();
+    });
+
+    discardBtn.addEventListener('click', () => {
+      preview.style.display = 'none';
+      pendingSentences = [];
+      koInput.value = '';
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      try {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '저장 중...';
+        await saveEntry();
+      } catch (e) {
+        console.error(e);
+        alert('저장하지 못했어요. Firebase 설정을 확인해주세요.');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '노트에 저장';
+      }
+    });
+
+    createRoomBtn.addEventListener('click', createRoom);
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        copyBtn.textContent = '복사됨';
+        setTimeout(() => copyBtn.textContent = '복사', 1200);
+      } catch (e) {
+        shareUrl.select();
+        document.execCommand('copy');
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      goToListView();
+    });
+
+    function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomFromUrl = urlParams.get('room') || localStorage.getItem('lastRoomId');
+
+      if (!roomFromUrl) {
+        onboarding.style.display = 'block';
+        shareBar.style.display = 'none';
+        return;
+      }
+
+      roomId = roomFromUrl;
+      showApp();
+      loadEntries();
+    }
+
+    init();
+  </script>
+</body>
+</html>
