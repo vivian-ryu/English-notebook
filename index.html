@@ -539,6 +539,7 @@ My goal is to study for 30 minutes every morning."></textarea>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: 'AIzaSyBM7bugwRjrCe3MMm6FFqEqGEMXC85bbl8',
@@ -551,6 +552,19 @@ My goal is to study for 30 minutes every morning."></textarea>
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    // 익명 인증 자동 처리
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('signed in', user.uid);
+      } else {
+        firebase.auth().signInAnonymously().catch(err => {
+          console.warn('익명 로그인 실패', err);
+          onboardErr.textContent = '익명 로그인에 실패했습니다. 콘솔을 확인해주세요.';
+          onboardErr.style.display = 'block';
+        });
+      }
+    });
 
     const backBtn = document.getElementById('backBtn');
     const koInput = document.getElementById('koInput');
@@ -603,7 +617,7 @@ My goal is to study for 30 minutes every morning."></textarea>
       return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     }
 
-    function createRoom() {
+    async function createRoom() {
       onboardErr.style.display = 'none';
       const id = genRoomId();
       const url = new URL(window.location.href);
@@ -612,6 +626,22 @@ My goal is to study for 30 minutes every morning."></textarea>
       roomId = id;
       localStorage.setItem('lastRoomId', id);
       entries = [];
+
+      // rooms/{roomId} 메타 문서 생성 (public=true)
+      try {
+        const roomRef = db.collection('rooms').doc(id);
+        await roomRef.set({
+          createdAt: firebase.firestore.Timestamp.now(),
+          public: true,
+          ownerUid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null
+        });
+      } catch (err) {
+        console.error('room 생성 실패', err);
+        onboardErr.textContent = '방을 만들지 못했어요. 콘솔을 확인해주세요.';
+        onboardErr.style.display = 'block';
+        return;
+      }
+
       showApp();
       renderListView();
     }
@@ -621,6 +651,7 @@ My goal is to study for 30 minutes every morning."></textarea>
     }
 
     async function loadEntries() {
+      if (!roomId) return;
       try {
         const snap = await collection().orderBy('createdAt', 'desc').get();
         entries = snap.docs.map(doc => {
@@ -628,7 +659,8 @@ My goal is to study for 30 minutes every morning."></textarea>
           return {
             id: doc.id,
             sentences: Array.isArray(data.sentences) ? data.sentences : [],
-            createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : new Date(data.createdAt).toISOString()) : new Date().toISOString()
+            createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : new Date(data.createdAt).toISOString()) : new Date().toISOString(),
+            ownerUid: data.ownerUid || null
           };
         });
       } catch (e) {
@@ -639,9 +671,11 @@ My goal is to study for 30 minutes every morning."></textarea>
     }
 
     async function insertEntry(entry) {
+      const user = firebase.auth().currentUser;
       await collection().doc(entry.id).set({
         sentences: entry.sentences,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date(entry.createdAt))
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date(entry.createdAt)),
+        ownerUid: user ? user.uid : null
       });
     }
 
@@ -826,6 +860,13 @@ My goal is to study for 30 minutes every morning."></textarea>
               return;
             }
 
+            // 클라이언트 권한 확인 (실제 권한은 Firestore 규칙에서 검증됩니다)
+            const user = firebase.auth().currentUser;
+            if (!user || user.uid !== entry.ownerUid) {
+              alert('이 문장을 수정할 권한이 없습니다. 작성자만 수정할 수 있습니다.');
+              return;
+            }
+
             const btn = e.currentTarget;
             btn.disabled = true;
             btn.textContent = '저장 중...';
@@ -845,11 +886,12 @@ My goal is to study for 30 minutes every morning."></textarea>
           });
         }
 
-        card.querySelector('.detail-entry-del').addEventListener('click', async (e) => {
+        const delBtn = card.querySelector('.detail-entry-del');
+        delBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
-          const pwd = prompt('삭제하시려면 비밀번호를 입력하세요');
-          if (pwd !== '5604') {
-            if (pwd !== null) alert('비밀번호가 일치하지 않습니다.');
+          const user = firebase.auth().currentUser;
+          if (!user || user.uid !== entry.ownerUid) {
+            alert('삭제 권한이 없습니다. 이 항목을 만든 사용자만 삭제할 수 있습니다.');
             return;
           }
 
@@ -953,9 +995,9 @@ My goal is to study for 30 minutes every morning."></textarea>
 
           item.querySelector('.entry-item-del').addEventListener('click', async (e) => {
             e.stopPropagation();
-            const pwd = prompt('삭제하시려면 비밀번호를 입력하세요');
-            if (pwd !== '5604') {
-              if (pwd !== null) alert('비밀번호가 일치하지 않습니다.');
+            const user = firebase.auth().currentUser;
+            if (!user || user.uid !== entry.ownerUid) {
+              alert('삭제 권한이 없습니다. 이 항목을 만든 사용자만 삭제할 수 있습니다.');
               return;
             }
             try {
@@ -988,7 +1030,8 @@ My goal is to study for 30 minutes every morning."></textarea>
       const entry = {
         id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
         sentences: pendingSentences,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        ownerUid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null
       };
       await insertEntry(entry);
       entries.unshift(entry);
@@ -998,62 +1041,22 @@ My goal is to study for 30 minutes every morning."></textarea>
       renderListView();
     }
 
-    translateBtn.addEventListener('click', () => {
-      renderPreview();
-    });
-
-    discardBtn.addEventListener('click', () => {
-      preview.style.display = 'none';
-      pendingSentences = [];
-      koInput.value = '';
-    });
-
-    saveBtn.addEventListener('click', async () => {
-      try {
-        saveBtn.disabled = true;
-        saveBtn.textContent = '저장 중...';
-        await saveEntry();
-      } catch (e) {
-        console.error(e);
-        alert('저장하지 못했어요. Firebase 설정을 확인해주세요.');
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = '노트에 저장';
-      }
-    });
-
+    // 이벤트 바인딩
     createRoomBtn.addEventListener('click', createRoom);
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        copyBtn.textContent = '복사됨';
-        setTimeout(() => copyBtn.textContent = '복사', 1200);
-      } catch (e) {
-        shareUrl.select();
-        document.execCommand('copy');
+    translateBtn.addEventListener('click', renderPreview);
+    discardBtn.addEventListener('click', () => { preview.style.display = 'none'; pendingSentences = []; });
+    saveBtn.addEventListener('click', saveEntry);
+
+    // 페이지 로드 시 방 파라미터가 있으면 불러오기
+    (function initFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const rid = params.get('room') || localStorage.getItem('lastRoomId');
+      if (rid) {
+        roomId = rid;
+        showApp();
+        loadEntries();
       }
-    });
-
-    backBtn.addEventListener('click', () => {
-      goToListView();
-    });
-
-    function init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomFromUrl = urlParams.get('room') || localStorage.getItem('lastRoomId');
-
-      if (!roomFromUrl) {
-        onboarding.style.display = 'block';
-        shareBar.style.display = 'none';
-        return;
-      }
-
-      roomId = roomFromUrl;
-      showApp();
-      loadEntries();
-    }
-
-    init();
+    })();
   </script>
 </body>
 </html>
