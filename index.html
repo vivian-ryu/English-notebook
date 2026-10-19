@@ -485,7 +485,7 @@
     <header class="top">
       <button class="back-btn" id="backBtn">← 돌아가기</button>
       <div class="brand">한 줄<span class="dot">,</span> 영어로</div>
-      <div class="streak">기록 <b id="entryCount">0</b>개</div>
+      <div class="streak">기록 <b id="entryCount">0</b>��</div>
     </header>
 
     <div class="share-bar" id="shareBar">
@@ -691,6 +691,29 @@ My goal is to study for 30 minutes every morning."></textarea>
       await collection().doc(id).update({ sentences });
     }
 
+    // 새 문장을 안전하게 추가하는 트랜잭션 함수
+    async function appendEntrySentences(entryId, newPairs) {
+      if (!Array.isArray(newPairs) || newPairs.length === 0) {
+        throw new Error('newPairs must be a non-empty array');
+      }
+      const user = firebase.auth().currentUser;
+      if (!user) throw new Error('Not authenticated');
+      const entryRef = collection().doc(entryId);
+      return firebase.firestore().runTransaction(async tx => {
+        const doc = await tx.get(entryRef);
+        if (!doc.exists) throw new Error('Entry not found');
+        const data = doc.data();
+        // 클라이언트 측 편의 체크: 소유자만 추가 가능하게 하려면 검사
+        if (data.ownerUid && data.ownerUid !== user.uid) {
+          throw new Error('권한 없음: 이 항목에 추가할 수 없습니다.');
+        }
+        const current = Array.isArray(data.sentences) ? data.sentences : [];
+        const updated = current.concat(newPairs.map(p => ({ ko: p.ko, en: p.en })));
+        tx.update(entryRef, { sentences: updated, updatedAt: firebase.firestore.Timestamp.now() });
+        return { before: current.length, after: updated.length };
+      });
+    }
+
     function groupByDate(items) {
       const groups = {};
       items.forEach(entry => {
@@ -827,6 +850,74 @@ My goal is to study for 30 minutes every morning."></textarea>
           ${pairsHtml}
           <div class="hide-hint">문장을 누르면 영어가 나타나고, 한글 문장을 누르면 그 문장만 수정할 수 있어요</div>
         `;
+
+        // 추가: 문장 추가 버튼을 detail-entry-actions에 붙이기
+        const actionsEl = card.querySelector('.detail-entry-actions');
+        if (actionsEl) {
+          const addBtn = document.createElement('button');
+          addBtn.className = 'btn-ghost';
+          addBtn.textContent = '문장 추가';
+          addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // 이미 추가 폼이 있으면 포커스 주기
+            if (card.querySelector('.add-sentence-form')) return;
+
+            const form = document.createElement('div');
+            form.className = 'add-sentence-form';
+            form.innerHTML = `
+              <div class="edit-field-label">한글</div>
+              <textarea class="edit-ko"></textarea>
+              <div class="edit-field-label">영어</div>
+              <textarea class="edit-en"></textarea>
+              <div class="edit-err" style="display:none;color:var(--wine);margin-bottom:8px;"></div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+                <button class="btn-ghost add-cancel">취소</button>
+                <button class="btn-primary add-save">추가</button>
+              </div>
+            `;
+            card.appendChild(form);
+
+            form.querySelector('.add-cancel').addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              form.remove();
+            });
+
+            form.querySelector('.add-save').addEventListener('click', async (ev) => {
+              ev.stopPropagation();
+              const ko = form.querySelector('.edit-ko').value.trim();
+              const en = stripQuotes(form.querySelector('.edit-en').value.trim());
+              const errEl = form.querySelector('.edit-err');
+              if (!ko || !en) {
+                errEl.textContent = '한글과 영어 문장을 모두 입력해주세요.';
+                errEl.style.display = 'block';
+                return;
+              }
+
+              const user = firebase.auth().currentUser;
+              if (!user || user.uid !== entry.ownerUid) {
+                alert('추가 권한이 없습니다. 작성자만 문장을 추가할 수 있습니다.');
+                return;
+              }
+
+              try {
+                ev.currentTarget.disabled = true;
+                ev.currentTarget.textContent = '추가 중...';
+                await appendEntrySentences(entry.id, [{ ko, en }]);
+                // 로컬 상태 업데이트
+                entry.sentences = (entry.sentences || []).concat([{ ko, en }]);
+                form.remove();
+                renderDetailView();
+              } catch (err) {
+                console.error(err);
+                errEl.textContent = err.message || '추가 실패';
+                errEl.style.display = 'block';
+                ev.currentTarget.disabled = false;
+                ev.currentTarget.textContent = '추가';
+              }
+            });
+          });
+          actionsEl.appendChild(addBtn);
+        }
 
         card.querySelectorAll('.entry-ko').forEach(koEl => {
           koEl.addEventListener('click', (e) => {
