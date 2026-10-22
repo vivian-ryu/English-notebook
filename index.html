@@ -19,8 +19,6 @@
       --wine-deep: #5A2A34;
       --wine-tint: #F1E0E2;
       --border: #CFCFBC;
-      --correction: #E8F5E9;
-      --correction-border: #A5D6A7;
     }
 
     * { box-sizing: border-box; }
@@ -31,13 +29,11 @@
       font-family: 'Noto Sans KR', -apple-system, sans-serif;
       min-height: 100vh;
     }
-
     .wrap {
       max-width: 760px;
       margin: 0 auto;
       padding: 48px 24px 80px;
     }
-
     .top {
       display: flex;
       align-items: center;
@@ -72,7 +68,6 @@
       cursor: pointer;
     }
     .back-btn.show { display: inline-block; }
-
     .share-bar {
       display: none;
       align-items: center;
@@ -102,7 +97,6 @@
       font-size: 12px;
       color: var(--ink-soft);
     }
-
     .onboarding {
       text-align: center;
       padding: 60px 20px;
@@ -123,7 +117,6 @@
       margin-top: 14px;
       display: none;
     }
-
     .compose {
       background: var(--card);
       border: 1px solid var(--border);
@@ -156,7 +149,6 @@
       background-image: repeating-linear-gradient(transparent, transparent 37px, var(--paper-line) 38px);
     }
     #koInput::placeholder { color: var(--ink-faint); }
-
     .compose-foot {
       display: flex;
       align-items: center;
@@ -164,7 +156,6 @@
       gap: 10px;
       margin-top: 14px;
     }
-
     button {
       font-family: 'Noto Sans KR', sans-serif;
       cursor: pointer;
@@ -178,10 +169,8 @@
       font-weight: 500;
       padding: 10px 20px;
       border-radius: 3px;
-      transition: background .15s ease, transform .1s ease;
     }
     .btn-primary:hover { background: var(--wine-deep); }
-    .btn-primary:active { transform: scale(0.98); }
     .btn-primary:disabled { background: var(--ink-faint); cursor: default; }
     .btn-ghost {
       font-size: 13px;
@@ -189,14 +178,12 @@
       padding: 10px 10px;
     }
     .btn-ghost:hover { color: var(--ink-soft); }
-
     .err-msg {
       font-size: 12px;
       color: var(--wine);
       margin-top: 6px;
       display: none;
     }
-
     .preview {
       display: none;
       margin-top: 18px;
@@ -224,16 +211,11 @@
       gap: 8px;
       margin-top: 14px;
     }
-
-    .list-head {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      color: var(--ink-faint);
-      text-transform: uppercase;
-      margin: 0 0 14px 2px;
+    .entries {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .entries { display: flex; flex-direction: column; gap: 12px; }
     .empty {
       font-size: 14px;
       color: var(--ink-faint);
@@ -242,10 +224,8 @@
       border-radius: 4px;
       text-align: center;
     }
-
     .date-group {
       border-left: 3px solid var(--border);
-      padding-left: 0;
     }
     .date-group-header {
       cursor: pointer;
@@ -254,15 +234,11 @@
       align-items: center;
       gap: 8px;
       user-select: none;
-      transition: background .15s ease;
     }
-    .date-group-header:hover { background: rgba(30,44,34,0.03); }
     .date-group-toggle {
       font-size: 12px;
       color: var(--ink-soft);
-      transition: transform .2s ease;
     }
-    .date-group-toggle.collapsed { transform: rotate(-90deg); }
     .date-group-title {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 12px;
@@ -280,33 +256,18 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding: 0 16px 8px 16px;
-      max-height: 1000px;
-      overflow: hidden;
-      transition: max-height .3s ease, opacity .3s ease, padding .3s ease;
-      opacity: 1;
+      padding: 0 16px 8px;
     }
-    .date-group-entries.collapsed {
-      max-height: 0;
-      opacity: 0;
-      padding: 0 16px;
-    }
-
     .entry-item {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 10px 14px;
       cursor: pointer;
-      transition: background .15s ease, border-color .15s ease;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-    }
-    .entry-item:hover {
-      background: rgba(30,44,34,0.02);
-      border-color: var(--wine);
     }
     .entry-item-content { flex: 1; min-width: 0; }
     .entry-item-preview {
@@ -319,12 +280,8 @@
     .entry-item-del {
       font-size: 12px;
       color: var(--ink-faint);
-      flex-shrink: 0;
-      cursor: pointer;
       padding: 4px;
     }
-    .entry-item-del:hover { color: var(--wine); }
-
     .detail-view { display: none; }
     .detail-view.show { display: block; }
     .detail-header {
@@ -370,38 +327,28 @@
       cursor: pointer;
       padding: 4px;
     }
-    .detail-entry-del:hover { color: var(--wine); }
-
     .sentence-pair {
       margin-bottom: 14px;
       position: relative;
     }
-    .sentence-pair:last-child { margin-bottom: 0; }
     .entry-ko {
       font-size: 15px;
       line-height: 1.7;
       color: var(--ink);
       white-space: pre-wrap;
       margin-bottom: 10px;
-      border-bottom: 1px dashed transparent;
-      transition: border-color .15s ease, color .15s ease;
     }
-    .entry-ko:hover { border-bottom-color: var(--ink-faint); }
     .mask {
       border-radius: 3px;
-      cursor: pointer;
       background: var(--ink);
       height: 36px;
-      transition: background .15s ease;
       margin-bottom: 8px;
     }
-    .mask:hover { background: var(--wine-deep); }
     .en-block {
       display: none;
       background: var(--wine-tint);
       border-radius: 3px;
       padding: 10px 12px;
-      cursor: pointer;
     }
     .en-block.shown { display: block; }
     .mask.shown { display: none; }
@@ -411,7 +358,6 @@
       line-height: 1.6;
       color: var(--wine-deep);
       margin-bottom: 10px;
-      display: block;
     }
     .listen-btn {
       display: inline-flex;
@@ -426,27 +372,12 @@
       padding: 6px 10px;
       margin-top: 4px;
     }
-    .listen-btn:hover { background: rgba(124,59,73,0.12); }
-    .listen-btn.playing {
-      background: var(--ink);
-      color: var(--paper);
-      border-color: var(--ink);
-    }
-
-    .hide-hint {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      color: var(--ink-faint);
-      margin-top: 8px;
-    }
-
     .edit-ko, .edit-en {
       width: 100%;
       resize: vertical;
       border: 1px solid var(--border);
       background: var(--paper);
       border-radius: 3px;
-      outline: none;
       font-family: 'Noto Sans KR', sans-serif;
       font-size: 14.5px;
       line-height: 1.7;
@@ -457,7 +388,6 @@
     }
     .edit-en {
       font-family: 'Fraunces', serif;
-      min-height: 44px;
     }
     .edit-field-label {
       font-family: 'IBM Plex Mono', monospace;
@@ -485,7 +415,7 @@
     <header class="top">
       <button class="back-btn" id="backBtn">← 돌아가기</button>
       <div class="brand">한 줄<span class="dot">,</span> 영어로</div>
-      <div class="streak">기록 <b id="entryCount">0</b>��</div>
+      <div class="streak">기록 <b id="entryCount">0</b>개</div>
     </header>
 
     <div class="share-bar" id="shareBar">
@@ -523,10 +453,7 @@ My goal is to study for 30 minutes every morning."></textarea>
         </div>
       </section>
 
-      <div class="list-head">지난 기록 <span style="text-transform:none; letter-spacing:0; color:var(--ink-faint);">· 이 링크를 여는 모든 사람과 공유됩니다</span></div>
-      <div class="entries" id="entries">
-        <div class="empty" id="emptyState">아직 저장된 노트가 없어요. 위에서 오늘의 문장을 적어보세요.</div>
-      </div>
+      <div class="entries" id="entries"></div>
 
       <div class="detail-view" id="detailView">
         <div class="detail-header">
@@ -553,19 +480,6 @@ My goal is to study for 30 minutes every morning."></textarea>
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 익명 인증 자동 처리
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        console.log('signed in', user.uid);
-      } else {
-        firebase.auth().signInAnonymously().catch(err => {
-          console.warn('익명 로그인 실패', err);
-          onboardErr.textContent = '익명 로그인에 실패했습니다. 콘솔을 확인해주세요.';
-          onboardErr.style.display = 'block';
-        });
-      }
-    });
-
     const backBtn = document.getElementById('backBtn');
     const koInput = document.getElementById('koInput');
     const translateBtn = document.getElementById('translateBtn');
@@ -575,7 +489,6 @@ My goal is to study for 30 minutes every morning."></textarea>
     const discardBtn = document.getElementById('discardBtn');
     const saveBtn = document.getElementById('saveBtn');
     const entriesBox = document.getElementById('entries');
-    const emptyState = document.getElementById('emptyState');
     const entryCount = document.getElementById('entryCount');
     const onboarding = document.getElementById('onboarding');
     const onboardErr = document.getElementById('onboardErr');
@@ -600,9 +513,64 @@ My goal is to study for 30 minutes every morning."></textarea>
       return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
     }
 
-    function getLocalDateString(iso) {
-      const d = new Date(iso);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    function escapeHtml(str = '') {
+      const div = document.createElement('div');
+      div.textContent = String(str);
+      return div.innerHTML;
+    }
+
+    function stripQuotes(text) {
+      return String(text).replace(/^['"]+|['"]+$/g, '').trim();
+    }
+
+    function getRoomIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('room') || localStorage.getItem('lastRoomId');
+    }
+
+    function collection() {
+      if (!roomId) return null;
+      return db.collection('rooms').doc(roomId).collection('entries');
+    }
+
+    async function ensureAuthed() {
+      let user = firebase.auth().currentUser;
+      if (user) return user;
+      const result = await firebase.auth().signInAnonymously();
+      return result.user;
+    }
+
+    function isEntryOwner(entry, user) {
+      if (!user) return false;
+      if (!entry || !entry.ownerUid) return true;
+      return entry.ownerUid === user.uid;
+    }
+
+    async function createRoom() {
+      onboardErr.style.display = 'none';
+      try {
+        const user = await ensureAuthed();
+        const id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID().slice(0, 12) : 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        const url = new URL(window.location.href);
+        url.searchParams.set('room', id);
+        window.history.replaceState({}, '', url.toString());
+        roomId = id;
+        localStorage.setItem('lastRoomId', id);
+        entries = [];
+
+        await db.collection('rooms').doc(id).set({
+          createdAt: firebase.firestore.Timestamp.now(),
+          public: true,
+          ownerUid: user.uid
+        });
+
+        showApp();
+        renderListView();
+      } catch (err) {
+        console.error('room 생성 실패', err);
+        onboardErr.textContent = '방을 만들지 못했어요. 콘솔을 확인해주세요.';
+        onboardErr.style.display = 'block';
+      }
     }
 
     function showApp() {
@@ -610,128 +578,6 @@ My goal is to study for 30 minutes every morning."></textarea>
       shareBar.style.display = 'flex';
       appMain.style.display = 'block';
       shareUrl.value = window.location.href;
-    }
-
-    function genRoomId() {
-      if (window.crypto && crypto.randomUUID) return crypto.randomUUID().slice(0, 12);
-      return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    }
-
-    async function createRoom() {
-      onboardErr.style.display = 'none';
-      const id = genRoomId();
-      const url = new URL(window.location.href);
-      url.searchParams.set('room', id);
-      window.history.replaceState({}, '', url.toString());
-      roomId = id;
-      localStorage.setItem('lastRoomId', id);
-      entries = [];
-
-      // rooms/{roomId} 메타 문서 생성 (public=true)
-      try {
-        const roomRef = db.collection('rooms').doc(id);
-        await roomRef.set({
-          createdAt: firebase.firestore.Timestamp.now(),
-          public: true,
-          ownerUid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null
-        });
-      } catch (err) {
-        console.error('room 생성 실패', err);
-        onboardErr.textContent = '방을 만들지 못했어요. 콘솔을 확인해주세요.';
-        onboardErr.style.display = 'block';
-        return;
-      }
-
-      showApp();
-      renderListView();
-    }
-
-    function collection() {
-      return db.collection('rooms').doc(roomId).collection('entries');
-    }
-
-    async function loadEntries() {
-      if (!roomId) return;
-      try {
-        const snap = await collection().orderBy('createdAt', 'desc').get();
-        entries = snap.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            sentences: Array.isArray(data.sentences) ? data.sentences : [],
-            createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : new Date(data.createdAt).toISOString()) : new Date().toISOString(),
-            ownerUid: data.ownerUid || null
-          };
-        });
-      } catch (e) {
-        console.error(e);
-        entries = [];
-      }
-      renderListView();
-    }
-
-    async function insertEntry(entry) {
-      const user = firebase.auth().currentUser;
-      await collection().doc(entry.id).set({
-        sentences: entry.sentences,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date(entry.createdAt)),
-        ownerUid: user ? user.uid : null
-      });
-    }
-
-    async function deleteEntry(id) {
-      await collection().doc(id).delete();
-    }
-
-    async function updateEntryDate(id, newIso) {
-      await collection().doc(id).update({ createdAt: firebase.firestore.Timestamp.fromDate(new Date(newIso)) });
-    }
-
-    async function updateEntrySentences(id, sentences) {
-      await collection().doc(id).update({ sentences });
-    }
-
-    // 새 문장을 안전하게 추가하는 트랜잭션 함수
-    async function appendEntrySentences(entryId, newPairs) {
-      if (!Array.isArray(newPairs) || newPairs.length === 0) {
-        throw new Error('newPairs must be a non-empty array');
-      }
-      const user = firebase.auth().currentUser;
-      if (!user) throw new Error('Not authenticated');
-      const entryRef = collection().doc(entryId);
-      return firebase.firestore().runTransaction(async tx => {
-        const doc = await tx.get(entryRef);
-        if (!doc.exists) throw new Error('Entry not found');
-        const data = doc.data();
-        // 클라이언트 측 편의 체크: 소유자만 추가 가능하게 하려면 검사
-        if (data.ownerUid && data.ownerUid !== user.uid) {
-          throw new Error('권한 없음: 이 항목에 추가할 수 없습니다.');
-        }
-        const current = Array.isArray(data.sentences) ? data.sentences : [];
-        const updated = current.concat(newPairs.map(p => ({ ko: p.ko, en: p.en })));
-        tx.update(entryRef, { sentences: updated, updatedAt: firebase.firestore.Timestamp.now() });
-        return { before: current.length, after: updated.length };
-      });
-    }
-
-    function groupByDate(items) {
-      const groups = {};
-      items.forEach(entry => {
-        const key = fmtDate(entry.createdAt);
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(entry);
-      });
-      return groups;
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function stripQuotes(text) {
-      return text.replace(/^['\"]+|['\"]+$/g, '').trim();
     }
 
     function parseInput() {
@@ -767,6 +613,87 @@ My goal is to study for 30 minutes every morning."></textarea>
       pendingSentences = pairs;
     }
 
+    async function loadEntries() {
+      if (!roomId) return;
+      const col = collection();
+      if (!col) return;
+      try {
+        const snap = await col.orderBy('createdAt', 'desc').get();
+        entries = snap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            sentences: Array.isArray(data.sentences) ? data.sentences : [],
+            createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : new Date(data.createdAt || Date.now()).toISOString(),
+            ownerUid: data.ownerUid || null
+          };
+        });
+      } catch (e) {
+        console.error(e);
+        entries = [];
+      }
+      renderListView();
+    }
+
+    async function insertEntry(entry) {
+      const user = await ensureAuthed();
+      const col = collection();
+      if (!col) return;
+      await col.doc(entry.id).set({
+        sentences: entry.sentences,
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date(entry.createdAt)),
+        ownerUid: user.uid
+      });
+    }
+
+    async function deleteEntry(id) {
+      const col = collection();
+      if (!col) return;
+      await col.doc(id).delete();
+    }
+
+    async function updateEntrySentences(id, sentences) {
+      const col = collection();
+      if (!col) return;
+      await col.doc(id).update({ sentences });
+    }
+
+    async function appendEntrySentences(entryId, newPairs) {
+      if (!Array.isArray(newPairs) || newPairs.length === 0) {
+        throw new Error('newPairs must be a non-empty array');
+      }
+      const user = await ensureAuthed();
+      const col = collection();
+      if (!col) throw new Error('Room not selected');
+
+      const entryRef = col.doc(entryId);
+      return firebase.firestore().runTransaction(async tx => {
+        const doc = await tx.get(entryRef);
+        if (!doc.exists) throw new Error('Entry not found');
+
+        const data = doc.data() || {};
+        const entry = { ownerUid: data.ownerUid || user.uid };
+        if (!isEntryOwner(entry, user)) {
+          throw new Error('권한 없음: 이 항목에 추가할 수 없습니다.');
+        }
+
+        const current = Array.isArray(data.sentences) ? data.sentences : [];
+        const updated = current.concat(newPairs.map(p => ({ ko: p.ko, en: p.en })));
+        tx.update(entryRef, { sentences: updated, updatedAt: firebase.firestore.Timestamp.now() });
+        return { before: current.length, after: updated.length };
+      });
+    }
+
+    function groupByDate(items) {
+      const groups = {};
+      items.forEach(entry => {
+        const key = fmtDate(entry.createdAt);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(entry);
+      });
+      return groups;
+    }
+
     function goToDetailView(date) {
       selectedDate = date;
       backBtn.classList.add('show');
@@ -785,6 +712,84 @@ My goal is to study for 30 minutes every morning."></textarea>
       renderListView();
     }
 
+    function renderListView() {
+      entryCount.textContent = String(entries.length);
+      entriesBox.innerHTML = '';
+
+      if (!entries.length) {
+        entriesBox.innerHTML = '<div class="empty">아직 저장된 노트가 없어요. 위에서 오늘의 문장을 적어보세요.</div>';
+        return;
+      }
+
+      const sorted = [...entries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const grouped = groupByDate(sorted);
+      const dates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+
+      dates.forEach(dateKey => {
+        const group = document.createElement('div');
+        group.className = 'date-group';
+
+        const header = document.createElement('div');
+        header.className = 'date-group-header';
+        header.innerHTML = `
+          <div class="date-group-toggle">▾</div>
+          <div class="date-group-title">${dateKey}</div>
+          <div class="date-group-count">${grouped[dateKey].length}</div>
+        `;
+
+        const body = document.createElement('div');
+        body.className = 'date-group-entries';
+
+        grouped[dateKey].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(entry => {
+          const item = document.createElement('div');
+          item.className = 'entry-item';
+          const previewText = (entry.sentences || []).map(s => s.ko).slice(0, 2).join(' · ');
+          item.innerHTML = `
+            <div class="entry-item-content">
+              <div class="entry-item-preview">${escapeHtml(previewText || '문장 없음')}</div>
+            </div>
+            <div class="entry-item-del" data-id="${entry.id}">삭제</div>
+          `;
+
+          item.addEventListener('click', e => {
+            if (e.target.closest('.entry-item-del')) return;
+            goToDetailView(dateKey);
+            selectedDate = dateKey;
+            renderDetailView();
+          });
+
+          item.querySelector('.entry-item-del').addEventListener('click', async e => {
+            e.stopPropagation();
+            const user = firebase.auth().currentUser;
+            if (!user || !isEntryOwner(entry, user)) {
+              alert('삭제 권한이 없습니다. 이 항목을 만든 사용자만 삭제할 수 있습니다.');
+              return;
+            }
+            try {
+              await deleteEntry(entry.id);
+              entries = entries.filter(item => item.id !== entry.id);
+              renderListView();
+            } catch (err) {
+              console.error(err);
+              alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
+            }
+          });
+
+          body.appendChild(item);
+        });
+
+        header.addEventListener('click', () => {
+          const collapsed = body.style.display === 'none';
+          body.style.display = collapsed ? 'flex' : 'none';
+          header.querySelector('.date-group-toggle').textContent = collapsed ? '▾' : '▸';
+        });
+
+        group.appendChild(header);
+        group.appendChild(body);
+        entriesBox.appendChild(group);
+      });
+    }
+
     function speakEnglish(text) {
       if (!('speechSynthesis' in window)) {
         alert('이 브라우저는 음성 재생을 지원하지 않습니다. Chrome 또는 Edge를 추천해요.');
@@ -800,8 +805,8 @@ My goal is to study for 30 minutes every morning."></textarea>
     }
 
     function renderDetailView() {
-      const sorted = [...entries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      const grouped = groupByDate(sorted);
+      if (!selectedDate) return;
+      const grouped = groupByDate(entries);
       const dayEntries = grouped[selectedDate] || [];
 
       detailTitle.textContent = selectedDate;
@@ -811,7 +816,7 @@ My goal is to study for 30 minutes every morning."></textarea>
         const card = document.createElement('div');
         card.className = 'detail-entry';
 
-        const pairsHtml = entry.sentences.map((s, idx) => {
+        const pairsHtml = (entry.sentences || []).map((s, idx) => {
           const key = `${entry.id}_${idx}`;
           if (editingSentenceKey === key) {
             return `
@@ -828,6 +833,7 @@ My goal is to study for 30 minutes every morning."></textarea>
               </div>
             `;
           }
+
           return `
             <div class="sentence-pair">
               <div class="entry-ko" data-key="${key}" title="클릭해서 이 문장만 수정">${escapeHtml(s.ko)}</div>
@@ -848,18 +854,14 @@ My goal is to study for 30 minutes every morning."></textarea>
             </div>
           </div>
           ${pairsHtml}
-          <div class="hide-hint">문장을 누르면 영어가 나타나고, 한글 문장을 누르면 그 문장만 수정할 수 있어요</div>
         `;
 
-        // 추가: 문장 추가 버튼을 detail-entry-actions에 붙이기
         const actionsEl = card.querySelector('.detail-entry-actions');
         if (actionsEl) {
           const addBtn = document.createElement('button');
           addBtn.className = 'btn-ghost';
           addBtn.textContent = '문장 추가';
-          addBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            // 이미 추가 폼이 있으면 포커스 주기
+          addBtn.addEventListener('click', () => {
             if (card.querySelector('.add-sentence-form')) return;
 
             const form = document.createElement('div');
@@ -869,24 +871,20 @@ My goal is to study for 30 minutes every morning."></textarea>
               <textarea class="edit-ko"></textarea>
               <div class="edit-field-label">영어</div>
               <textarea class="edit-en"></textarea>
-              <div class="edit-err" style="display:none;color:var(--wine);margin-bottom:8px;"></div>
-              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+              <div class="edit-err" style="display:none;"></div>
+              <div class="edit-actions">
                 <button class="btn-ghost add-cancel">취소</button>
                 <button class="btn-primary add-save">추가</button>
               </div>
             `;
             card.appendChild(form);
 
-            form.querySelector('.add-cancel').addEventListener('click', (ev) => {
-              ev.stopPropagation();
-              form.remove();
-            });
-
-            form.querySelector('.add-save').addEventListener('click', async (ev) => {
-              ev.stopPropagation();
+            form.querySelector('.add-cancel').addEventListener('click', () => form.remove());
+            form.querySelector('.add-save').addEventListener('click', async () => {
               const ko = form.querySelector('.edit-ko').value.trim();
               const en = stripQuotes(form.querySelector('.edit-en').value.trim());
               const errEl = form.querySelector('.edit-err');
+
               if (!ko || !en) {
                 errEl.textContent = '한글과 영어 문장을 모두 입력해주세요.';
                 errEl.style.display = 'block';
@@ -894,16 +892,16 @@ My goal is to study for 30 minutes every morning."></textarea>
               }
 
               const user = firebase.auth().currentUser;
-              if (!user || user.uid !== entry.ownerUid) {
+              if (!user || !isEntryOwner(entry, user)) {
                 alert('추가 권한이 없습니다. 작성자만 문장을 추가할 수 있습니다.');
                 return;
               }
 
               try {
-                ev.currentTarget.disabled = true;
-                ev.currentTarget.textContent = '추가 중...';
+                const btn = form.querySelector('.add-save');
+                btn.disabled = true;
+                btn.textContent = '추가 중...';
                 await appendEntrySentences(entry.id, [{ ko, en }]);
-                // 로컬 상태 업데이트
                 entry.sentences = (entry.sentences || []).concat([{ ko, en }]);
                 form.remove();
                 renderDetailView();
@@ -911,8 +909,6 @@ My goal is to study for 30 minutes every morning."></textarea>
                 console.error(err);
                 errEl.textContent = err.message || '추가 실패';
                 errEl.style.display = 'block';
-                ev.currentTarget.disabled = false;
-                ev.currentTarget.textContent = '추가';
               }
             });
           });
@@ -920,10 +916,36 @@ My goal is to study for 30 minutes every morning."></textarea>
         }
 
         card.querySelectorAll('.entry-ko').forEach(koEl => {
-          koEl.addEventListener('click', (e) => {
+          koEl.addEventListener('click', e => {
             e.stopPropagation();
             editingSentenceKey = koEl.dataset.key;
             renderDetailView();
+          });
+        });
+
+        card.querySelectorAll('.mask').forEach(mask => {
+          mask.addEventListener('click', e => {
+            e.stopPropagation();
+            const key = mask.dataset.key;
+            const block = card.querySelector(`.en-block[data-key="${key}"]`);
+            if (block) block.classList.add('shown');
+            mask.classList.add('shown');
+          });
+        });
+
+        card.querySelectorAll('.en-block').forEach(block => {
+          block.addEventListener('click', e => {
+            e.stopPropagation();
+            block.classList.remove('shown');
+            const mask = card.querySelector(`.mask[data-key="${block.dataset.key}"]`);
+            if (mask) mask.classList.remove('shown');
+          });
+        });
+
+        card.querySelectorAll('.listen-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            speakEnglish(btn.dataset.speak || '');
           });
         });
 
@@ -935,13 +957,13 @@ My goal is to study for 30 minutes every morning."></textarea>
           const enTextarea = editingBlock.querySelector('.edit-en');
           const editErr = editingBlock.querySelector('.edit-err');
 
-          editingBlock.querySelector('.sentence-edit-cancel').addEventListener('click', (e) => {
+          editingBlock.querySelector('.sentence-edit-cancel').addEventListener('click', e => {
             e.stopPropagation();
             editingSentenceKey = null;
             renderDetailView();
           });
 
-          editingBlock.querySelector('.sentence-edit-save').addEventListener('click', async (e) => {
+          editingBlock.querySelector('.sentence-edit-save').addEventListener('click', async e => {
             e.stopPropagation();
             const newKo = koTextarea.value.trim();
             const newEn = stripQuotes(enTextarea.value.trim());
@@ -951,9 +973,8 @@ My goal is to study for 30 minutes every morning."></textarea>
               return;
             }
 
-            // 클라이언트 권한 확인 (실제 권한은 Firestore 규칙에서 검증됩니다)
             const user = firebase.auth().currentUser;
-            if (!user || user.uid !== entry.ownerUid) {
+            if (!user || !isEntryOwner(entry, user)) {
               alert('이 문장을 수정할 권한이 없습니다. 작성자만 수정할 수 있습니다.');
               return;
             }
@@ -961,7 +982,7 @@ My goal is to study for 30 minutes every morning."></textarea>
             const btn = e.currentTarget;
             btn.disabled = true;
             btn.textContent = '저장 중...';
-            const updatedSentences = entry.sentences.map((s, i) => i === idx ? { ko: newKo, en: newEn } : s);
+            const updatedSentences = (entry.sentences || []).map((s, i) => i === idx ? { ko: newKo, en: newEn } : s);
             try {
               await updateEntrySentences(entry.id, updatedSentences);
               entry.sentences = updatedSentences;
@@ -978,10 +999,10 @@ My goal is to study for 30 minutes every morning."></textarea>
         }
 
         const delBtn = card.querySelector('.detail-entry-del');
-        delBtn.addEventListener('click', async (e) => {
+        delBtn.addEventListener('click', async e => {
           e.stopPropagation();
           const user = firebase.auth().currentUser;
-          if (!user || user.uid !== entry.ownerUid) {
+          if (!user || !isEntryOwner(entry, user)) {
             alert('삭제 권한이 없습니다. 이 항목을 만든 사용자만 삭제할 수 있습니다.');
             return;
           }
@@ -1003,127 +1024,20 @@ My goal is to study for 30 minutes every morning."></textarea>
 
         detailEntries.appendChild(card);
       });
-
-      detailEntries.querySelectorAll('.listen-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const text = btn.dataset.speak || '';
-          if (!text) return;
-          btn.classList.add('playing');
-          btn.textContent = '🔊 재생 중';
-          speakEnglish(text);
-          setTimeout(() => {
-            btn.classList.remove('playing');
-            btn.textContent = '🔊 듣기';
-          }, 1500);
-        });
-      });
-
-      detailEntries.querySelectorAll('.mask').forEach(mask => {
-        mask.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const key = mask.dataset.key;
-          mask.classList.add('shown');
-          const block = detailEntries.querySelector(`.en-block[data-key="${key}"]`);
-          if (block) block.classList.add('shown');
-        });
-      });
-
-      detailEntries.querySelectorAll('.en-block').forEach(block => {
-        block.addEventListener('click', (e) => {
-          e.stopPropagation();
-          block.classList.remove('shown');
-          const key = block.dataset.key;
-          const maskEl = detailEntries.querySelector(`.mask[data-key="${key}"]`);
-          if (maskEl) maskEl.classList.remove('shown');
-        });
-      });
-    }
-
-    function renderListView() {
-      entryCount.textContent = entries.length;
-      entriesBox.innerHTML = '';
-
-      if (entries.length === 0) {
-        entriesBox.appendChild(emptyState);
-        return;
-      }
-
-      const sorted = [...entries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      const grouped = groupByDate(sorted);
-      const dates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
-
-      dates.forEach(dateKey => {
-        const group = document.createElement('div');
-        group.className = 'date-group';
-
-        const header = document.createElement('div');
-        header.className = 'date-group-header';
-        header.innerHTML = `
-          <div class="date-group-toggle">▾</div>
-          <div class="date-group-title">${dateKey}</div>
-          <div class="date-group-count">${grouped[dateKey].length}개</div>
-        `;
-
-        const entriesWrap = document.createElement('div');
-        entriesWrap.className = 'date-group-entries';
-
-        grouped[dateKey].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(entry => {
-          const item = document.createElement('div');
-          item.className = 'entry-item';
-          const previewText = entry.sentences.map(s => s.ko).slice(0, 2).join(' · ');
-          item.innerHTML = `
-            <div class="entry-item-content">
-              <div class="entry-item-preview">${escapeHtml(previewText)}</div>
-            </div>
-            <div class="entry-item-del" data-id="${entry.id}">삭제</div>
-          `;
-
-          item.addEventListener('click', (e) => {
-            if (e.target.closest('.entry-item-del')) return;
-            goToDetailView(dateKey);
-          });
-
-          item.querySelector('.entry-item-del').addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const user = firebase.auth().currentUser;
-            if (!user || user.uid !== entry.ownerUid) {
-              alert('삭제 권한이 없습니다. 이 항목을 만든 사용자만 삭제할 수 있습니다.');
-              return;
-            }
-            try {
-              await deleteEntry(entry.id);
-              entries = entries.filter(itemEntry => itemEntry.id !== entry.id);
-              renderListView();
-            } catch (err) {
-              console.error(err);
-              alert('삭제하지 못했어요. 잠시 후 다시 시도해주세요.');
-            }
-          });
-
-          entriesWrap.appendChild(item);
-        });
-
-        header.addEventListener('click', () => {
-          const collapsed = entriesWrap.classList.toggle('collapsed');
-          const toggle = header.querySelector('.date-group-toggle');
-          toggle.classList.toggle('collapsed', collapsed);
-        });
-
-        group.appendChild(header);
-        group.appendChild(entriesWrap);
-        entriesBox.appendChild(group);
-      });
     }
 
     async function saveEntry() {
-      if (!pendingSentences.length) return;
+      const pairs = pendingSentences;
+      if (!pairs || !pairs.length) return;
+
+      const user = await ensureAuthed();
       const entry = {
-        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        sentences: pendingSentences,
+        id: 'e_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+        sentences: pairs,
         createdAt: new Date().toISOString(),
-        ownerUid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null
+        ownerUid: user.uid
       };
+
       await insertEntry(entry);
       entries.unshift(entry);
       koInput.value = '';
@@ -1132,20 +1046,42 @@ My goal is to study for 30 minutes every morning."></textarea>
       renderListView();
     }
 
-    // 이벤트 바인딩
-    createRoomBtn.addEventListener('click', createRoom);
-    translateBtn.addEventListener('click', renderPreview);
-    discardBtn.addEventListener('click', () => { preview.style.display = 'none'; pendingSentences = []; });
-    saveBtn.addEventListener('click', saveEntry);
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl.value);
+        copyBtn.textContent = '복사됨';
+        setTimeout(() => copyBtn.textContent = '복사', 1200);
+      } catch (e) {
+        shareUrl.select();
+        document.execCommand('copy');
+      }
+    });
 
-    // 페이지 로드 시 방 파라미터가 있으면 불러오기
-    (function initFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const rid = params.get('room') || localStorage.getItem('lastRoomId');
-      if (rid) {
-        roomId = rid;
+    translateBtn.addEventListener('click', renderPreview);
+    discardBtn.addEventListener('click', () => {
+      preview.style.display = 'none';
+      pendingSentences = [];
+    });
+    saveBtn.addEventListener('click', saveEntry);
+    createRoomBtn.addEventListener('click', createRoom);
+    backBtn.addEventListener('click', goToListView);
+
+    firebase.auth().onAuthStateChanged(async user => {
+      if (!roomId) {
+        roomId = getRoomIdFromUrl();
+      }
+      if (roomId) {
         showApp();
-        loadEntries();
+        await loadEntries();
+      }
+    });
+
+    (async function initFromUrl() {
+      const room = getRoomIdFromUrl();
+      if (room) {
+        roomId = room;
+        showApp();
+        await loadEntries();
       }
     })();
   </script>
